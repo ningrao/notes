@@ -1,0 +1,297 @@
+set NODE_PATH=%AppData%\npm\node_modules
+@) install downloaded package in linux:
+1. wget https://nodejs.org/dist/v6.7.0/node-v6.7.0-linux-x86.tar.gz
+2. Extract what you downloaded:
+tar xzvf node-v6.7.0-linux-x64.tar.gz
+
+3. Change the file ownership:
+sudo chown -Rv root.root node-v6.7.0-linux-x64
+
+4. Install files in /usr/local
+sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
+# (change -Rvi to -Rvf if you want to overwrite existing files)
+
+@) execute locally installed binary (in node_modules/.bin)
+	PATH=$(npm bin):$PATH cmd
+
+---------------------------------
+ npm 
+---------------------------------
+@) semver
+ *) ~: 1.1.x
+ *) ^: 1.x.x
+
+@) install location:
+ *) win: %appdata%\npm\node_modules
+ *) linux: /usr/lib/node_modules
+
+@) npm install will remove those not included in pakcage.json;
+
+@) run arbitrary script in 'scripts' of 'package.json'
+	npm run name
+ *) &&(serial), &, >, <, |
+ *) local node_modules takes precedence;
+ *) local command resides in 'node_modules/.bin/';
+ *) then os command;
+
+@) module for os command:
+ *) rimraf: rm
+ *) mkdirp: mkdir
+ *) cpx: cp
+ *) fs-extra: all above and others(don't support blob);
+
+@) name@latest to ensure the lastest version is installed;
+
+@) published package usually contains /lib (source codes) and /dist (compiled);
+ *) 'npm publish' picks files listed in 'files' field of package.json;
+
+@) package.json keys:
+ *) id, type, _*, $*: package registries;
+ *) custom: com_baidu.www
+ *) read in nodejs: process.env.npm_package_key_subkey
+
+@) 'bin' in package.json tell npm install '.cmd' in '.bin', specify open program at the start if needed;
+
+@) npm-shrinkwrap.json totally the same with package-lock.json
+ *) npm-shrinkwrap.json is used for publishing to npm;
+ *) package-lock.json always reflects the latest repository;
+
+@) scrips key corresponding to life-cycle events name are executed automatically(preinstall, posttest...);
+ *) prepublish: before 'npm i' and published;
+
+@) show package.json of a package in registry:
+	npm view pkg [item]
+@) show version of a local package:
+	cd dir
+	npm version
+
+@) read/write npm config:
+	npm config set/get opt
+
+@) 'devDependencies' 
+ *) installed in current directory as 'npm i'(except specify --production or 'NODE_ENV' of value 'production');
+ *) won't install in package as 'npm i pkg'(except specify --development or 'NODE_ENV' of value 'development');
+
+@) 'peerDependencies' won't install in version not earllier than 3.0;
+ *) used for a plugin, specifies which version of host this works for;
+ *) if warning appears, things must be that the installed host doesn't match with this plugin, or no host is installed yet;
+
+@) list installed dependencies:
+npm list [-g] pkg
+
+@) show detail:
+npm info [-g] pkg
+
+@) npm prune: move duplicate module to the common ancestor;
+
+@) link dependency to global module;
+ *) npm install --link
+ *) npm link
+ *) in npmrc: link=true
+
+@) global package is installed in directory specified by config 'prefix';
+
+@) browserify:
+ *) 'process' module:
+ 	.) nextTick
+	.) browser
+@) load 'jsx' in nodejs: node-jsx
+
+@) npm-run-all/npm-s/npm-p: sequential by default;
+---------------------------------------
+express
+---------------------------------------
+@) router path should start with slash;
+router.get('/add', ctrl);
+
+@) in template, variables in 'global' and 'app.locals' are accessible as global;
+
+@) app.get('env') is the value of process.env.NODE_ENV in node, which is set to 'production' or 'development'
+
+@)
+router=express.Router();
+router.get('/file1',function(){
+	req.baseUrl	-> /dir1
+	req.path	-> /file1
+});
+app.use('/dir1', router);
+
+/dir1/file2	->	(in error handler)
+	req.baseUrl	-> ''
+	req.path	-> /dir1/file1
+
+--------------------------------------------------------------------------------
+general
+--------------------------------------------------------------------------------
+@) pros
+ *) full stack
+ *) render html in server;
+ *) non-blocking, less resource more requests; suitable for persistent connection;
+@) cons
+ *) cpu intensive will block response;
+ *) relational database less favorable;
+
+@) process.argv: node, js, arg0, arg1....
+ 
+@) process.env: cannot store complex data, will be converted to string when set;
+ 
+@) when deploy, either along with all dependencies or lock down them with shrinkwrap;
+ 
+@) require(): when load a directory, it checks:
+	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
+@) 
+require('pkg')	-> installed package 
+ * find in paths in 'module.paths'
+require('./file')	-> local file
+
+@) require.main: the entry module;
+@) require.main.require('util/do'): starts from app root;
+@) 
+
+@) secure ways:
+ *) least priviledge for accounts;
+ *) limit error messages;
+ *) HTTP Strict-Transport-Security header to dictate brower only to connect via https;
+ 	Strict-Transport-Security: max-age=<expire-time>; includeSubDomains
+ 	
+ *) code injection(construct command from user input)
+ 	.) eval/function
+	.) exec/child_process(limit input and access rights)
+	.) db command(validate/escape/preparedStatement)
+ *) database
+ 	.) limit rights to db account for different connection for different operations(code injection damage is limited); 
+	.) prevent concurrency(atomic: findAndUpdate; lock);
+ *) restful api with sessionid in url suffers 'session fixation attack';	-> regenerate id when logged in;
+
+@) use stream for less memory consumption;
+
+@) concurrency occurs when an async operation returned, before its callback executes, another request invokes this asnyc operation again; the latter operation should operate on the value the first callback returns, but it operates on the same one;
+	redis.get('key', function(err, value){
+		redis.set('key', value * 2);
+	});
+ *) lock a process wide object in a single process; or external object(database) in cluster; if locked, append to next event loop; (module async-lock) (prevent eternal lock cause by crash with timestamp);
+ *) atomic operation;
+
+@) callback hell is deep nested callbacks; 
+ *) modularization: move callback to top level with name, even wrapped in a module;
+ *) promise;
+ *) generator/async&await;
+
+ *) event;
+ *) control flow library(async, step,...);
+
+@) better wrap a single task in a seperate module with less than 150 lines;
+
+@) ecma5 support:
+	http://node.green/
+
+@) async callback invocation is appended to the event loop; 
+
+@) give callback function a name for stack trace;
+
+@) no thread can be created, instead apply child_process;
+
+@) exception:
+ *) error-first callback emphasize that each error should be handled;
+ *) unhandled exception propagate up to process.on('uncaughtException') is better to be only logged and let the process terminate;
+ *) group multiple IO operations in 'domain' is deprecated;
+
+@) process.on('unhandledRejection')	catch promises unhandled rejection;
+
+@) don't listen at 80;
+
+@) default heap size: 1.4G(64bit)/512M(32bit)
+ *) small part(M): --max-old-space-size=4096 
+ [*) large part(K): --max-new-space-size=4096]
+
+@) process.env is variables set on commandline when start node;
+
+@) global variables:
+ *) in 'global' object, equivalent to 'window', whose property can be accessed as global variable;
+ *) top level variables declared are within the scope of this module, not stored as property of 'global';
+ 	.) more efficient to access them;
+
+@) three ways to deliver errors(don't mixed sync with async in a function): 
+ *) sync: Throw;
+ *) asyc: Callback, EventEmitter
+
+@) defined errors should be handled, instead those which are not defined should be delivered;    
+
+@) console actions are synchronous blocking event loop;
+
+@) debug
+ *) c(cont)/n(over)/s(in)/o(out)/pause
+ *) run 'repl', then view target varibles;
+ *) exec console.log(''); exec varName (better than repl for reading variable once);
+ *) sb/cb/breakpoints([file,] line) 
+ *) scripts: list loaded scripts
+ *) watch/unwatch/watchers expr
+ *) list(num): list lines;
+ *) backtrace(bt)
+ *) run: start again
+ *) restart
+
+@) `node inspect` debug in cmd; 
+@) `node --inspect` debug in chrome DevTool; 
+
+@) `node debug` works more stably than `node inspect`  
+
+@) when run in debug mode, don't redirect output like this:
+node debug path > file
+
+@) redirect console output:
+	node path 1>file
+
+@) auto garbage collection(-nouse-idle-notification) can be reduced and do it manually(-expose_gc: gc());
+
+@) to use strict mode, set node flag for application, or add directive in page;
+
+
+@) use sync io method only when init;
+
+@) install multiple nodejs, use node package: 'n' 
+
+
+@) console
+ *) sync: terminal/file
+ *) async: |
+ *) color (syntax same to bash: \e[*m --> \x1b[*m ): ('\x1b[32m%s\x1b[0m', 'string');
+
+node app.js 2>err.log | tee 'app.log'
+2:sync; &1:async;
+
+@) always log to stdout/stderr, leave log routing to supervisor process;
+
+@) async event precedence:
+I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
+
+@) jade, add plain text, prefix '|' in a line or add suffix '.' after the tag;
+
+@) strongloop / strong-pm (the former includes the latter);
+ *) create strong-pm service: 'slc pm-install' / 'sl-pm-install'
+ *) run strong-pm as transient process: 'slc pm' / 'sl-pm'
+ *) install as systemd service: slc pm-install --systemd
+ *) slc ctl	/	sl-pmctl
+
+ *) file deployed in 'svc' under '--base';
+
+@) child_process
+ *) response in time (suitible for long-living as service)
+	*) spawn: stream, subshell configurable
+		*) fork: nodejs process
+ *) response once after finished (suitable for application to compute result)
+	*) exec: subshell
+	*) execFile: background process
+
+@) path.resolve
+ *) returns an absolute path; 
+ *) the last supplied absolute path supersedes the formers (abandoned);
+ *) if none is supplied, cwd is applied;
+
+@) url.resolve 
+
+@) --preserve-symlinks omit 'main' file (entry file);
+
+@) debug inline: `node inspect[-brk]`
+
+@) debug in chrome: `node --inspect[-brk]`

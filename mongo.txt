@@ -1,0 +1,106 @@
+
+---------------------------------------
+mongodb
+---------------------------------------
+@) advantages:
+ *) model is more natural to business;
+ *) more efficient to aggregate data(eliminating trans-table or trans-node joining);
+ *) optimized to access instead of write;
+
+@) doc size limit: 16MB;
+
+@) 'Object' type is sub-document;
+
+@) no transaction;
+
+@) no prepared statement;
+
+@) sub-document(one-many; one-one):
+ *) benefit from doc-atomic;
+
+@) separate/ref-doc(many-many):
+ *) querying flexibility but more steps;
+ *) easy to ref from multiple places;
+
+
+@) shell script: 
+Shell Helpers		----		JavaScript Equivalents
+show dbs, show databases		db.adminCommand('listDatabases')
+use <db>						db = db.getSiblingDB('<db>')
+show collections				db.getCollectionNames()
+show users						db.getUsers()
+show roles						db.getRoles({showBuiltinRoles: true})
+show log <logname>				db.adminCommand({ 'getLog' : '<logname>' })
+show logs						db.adminCommand({ 'getLog' : '*' })
+it								cursor = db.collection.find()
+								if ( cursor.hasNext() ){	 
+									cursor.next();
+								}
+
+@) field of array element can't be renamed;
+
+@) when update array element, the array field should appear in query;
+
+@) search array, when multiple critera, better use '$elemMatch', if single better not:
+{a:1, arr:[{f1:1, f2:2}]}
+-single--------------------
+{'arr.f1':1}
+-multiple--------------------
+{arr:{$elemMatch:{f1:1, f2:2}}}
+
+@) if update document only contains key-value pairs, then the whole doc is changed except id; to update/delete spicific subfields use operator: $set/$unset;
+
+@) only a single array element can be updated once('$' or number is required in update but not in query):
+	update({'arr.f':'v'}, {$set:{'arr.$.f':'v2'}}); 
+
+@) when query conditions contain an array field:
+ *) when any of the array element matches, the document is matched; which is returned with the whole array;
+ *) when update, the array positional number indicates the index to the whole array; whereas '$' indicates the first element in the array which exactly matches the conditions which refers to the array field (so if no condition referring to the array field, $ is an error);
+
+@) $elemMatch operator
+ *) query: don't affect which array elements are returned, e.g. all are turned with the whole document;
+ *) project: select the first element matched to return;
+
+@) $elemMatch project operator throws error if value can't be found;
+Projection cannot have a mix of inclusion and exclusion.
+
+@) remove doc-array elements:
+update(query, {$pull:{arr:{f1:val}}}, {multi:true});
+
+@) append array as a single element:
+{$push:{f1:[val1, val2]}}
+
+@) append each element in an array as a single element:
+{$push:{f1:{$each:[val1, val2]}}}
+
+@) wrap objectId string in ObjectId();
+
+@) 'project' only specify fields to return or not; so only true/false can be set; exceptions are:
+ *) array: several operators can be used;
+ *) $meta;
+
+@) comparsion operator on array:
+ *) $ne check all elements, others only one;
+
+@) two-phase commit:
+ *) transaction record: participants, transaction data, holding application;
+ *) participants: include a field to contain transactions, in which this voted;
+ *) background threads to traverse transactions for those pending caused by certain system problem;
+ *) when a transaction picked is in the middle state, to go forward(recover) or backward(rollback) depends on business logic(such as time elapsed);
+ *) states:
+ initial	->	pending	------>	applied	--------------------> done
+ 						(votes)			(participants quit) 
+				canceling	->	cancelled
+
+@) sharding keys usually are the same with index;
+
+---------------------------------------
+mongoose
+---------------------------------------
+@) returned data only contains those fields defined in model, except '_id';
+
+@) types are in mongoose.Schema.Types
+
+@) objectId string is converted to ObjectId inner mongoose;
+
+@) an '_id' was created automatically in new model for sub-document; also a method 'id()' exists for search;

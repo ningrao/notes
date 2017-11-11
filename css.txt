@@ -1,0 +1,164 @@
+=================================
+https://www.w3.org/Style/CSS/current-work
+https://drafts.csswg.org/
+=================================
+@) specificity:
+------------------------------------------
+sass
+------------------------------------------
+*) semicolon is mandatory;
+
+------------------------------------------------------------
+inline	->	id	->	attr & class	-> element & pseudo element
+
+@) BEM naming:
+ *) Block: .block
+ *) Element: .block__elm
+ *) Modifier: .block__elm--color-red
+
+@) hsl(0-360, 0-1, 0-1)
+
+@) region chain:
+ *) flow-into: named_flow
+ *) flow-from: named_flow
+ *) region-break: auto/break(break to non-exist region when overflow);
+ @) @region selector{}
+
+@) break(page/column/region): break-inside/before/after
+
+@) css module no syntax for multi-rules in curly braces (:global{}); ':global' has to be prepended to each rule;
+	 
+
+@) shorthand properties set all sub-properties, missing values are set to 'initial';
+ *) some sub-property can only be set to initial(no way to set it);
+ *) 'all:initial | inherit | unset' is a special shorthand, which reset all properties(except 'direction' / 'unicode-bidi');
+ *) !important applies to all;
+
+@) namespace:
+	@namespace ns 'http://faf'
+	ns|div{}
+
+@) conditional:
+ *) @media:
+ @media screen and (min-width: 35em),
+        print and (min-width: 40em) {
+			  #section_navigation { float: left; width: 10em; }
+			  @media (max-width: 12cm) { // rule (2)
+				  .note { float: none }
+			 }
+		}
+ *)	@support:
+
+@supports ( box-shadow: 2px 2px 2px black ) or
+          ( -moz-box-shadow: 2px 2px 2px black ) or
+          ( -webkit-box-shadow: 2px 2px 2px black ) and 
+          not ( -o-box-shadow: 2px 2px 2px black ) {
+  .outline {
+    color: white;
+    -moz-box-shadow: 2px 2px 2px black;
+    -webkit-box-shadow: 2px 2px 2px black;
+    -o-box-shadow: 2px 2px 2px black;
+    box-shadow: 2px 2px 2px black; /* unprefixed last */
+  }
+}
+
+@) :target denotes this element is referred by some link anchor;
+
+@) :indeterminate denotes a checkbox/radio is in indeterminated state; 
+
+@) :root	->html
+
+@) :only-child	->:first-child:last-child
+
+@) :empty	-> <p></p>
+
+@) :not(div)
+
+@) sibling(only predecesor constraint): 
+ *) div+p	-> p which follows div;
+ *) div~p	-> p which succeeds div(may not immediately);
+
+@) attribute selector accept 'starts'/'end'/'includes':
+
+@) attribute selector accept 'starts'/'end'/'includes':
+[attr^='val']	/	[attr$='val']	/	[attr*='val']	
+
+@) multi-column extends 'block', for texts;
+ *) flex-wrap: multiple rows/columns;
+ *) column-count: total columns;
+ *) column-width: minimum width;
+ *) column-fill:auto/balance;
+ *) column-span:all; --applied on element;
+ **) minimum-width takes precedence than count; usually only one is set, and both takes the property name 'columns';
+ *) breaks on inline element(occupies a single column), block elements are not broken(stacked in a single column);
+ *) each column has the same width(column-fill:balance controlls content to spread equally);
+
+
+@) visibility:collapse works only in row/column, or equal to hidden;
+ *) different from 'none', which would not affect the layout of cells;
+
+@) 7 layouts: block, inline, table, positioned, column, flex, grid;
+
+@) flex
+ *) disply:flex/inline-flex
+ *) items have equal size in cross axis as table-cell;
+ *) no effect: column, float/clear, vertical-align, ::first*;
+ *) direct text is wrapped in anonymous item;
+ *) absolutely positioned child doesn't participate in the flex layout;
+ *) percentage in padding/margin on item is not consistent across browsers;
+ *) flex-basis: initial width before fill is applied, take precedence over 'width/height';
+ *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space or shrinked space;
+ *) if no flex-grow/shrink is specified, fill based on the propotion of their basis;
+ *) align: justify-content/align-items
+ *) flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
+
+
+@) grid
+ *) margins of container/content and item/item don't collapse;
+ *) 'auto' is 'max-content' or minimum size(towarding to content size);
+ *) name in '[]' denotes line;
+ *) 1fr takes 1/* of all fractions;
+
+
+
+@) 3d:
+ *) space, e.g. distance from user to the z=0 plane(if not set, always 2 dimensions); the smaller the closer and the bigger:
+ 	.) container:
+		perspective:100px;
+	.) itself(placed before 3d transformation or no effect):
+		transform: perspective(100px) rotateY(45deg)
+ *) viewer stand point(vanishing point):
+ 	perspective-origin: 0 0;
+ *) z=0 plane is screen; positive translateZ move element toward user(becomes larger); when bigger than perspective, it disappears;
+ 	transform: translateZ(101px);
+ *) to move an element's z=0 plane, set translateZ to its ancestor;
+ *) don't show from back:
+ 	backface-visibility:hidden;
+ 	transform: rotateY(91deg);
+ *) when element is moved off from z=0 plane, rotating is around its original location/'z=0 plane', the distance is rotating radius;
+ *) when parent has translate(even 0deg), immediate children will have no effect for its translate, unless set this on the parent:
+ 	transform-style:preserve-3d;
+	**) this will not be inheritted;
+
+@) vertical align:
+ *) table-cell & vertical-align
+ *) flex & align-items
+ *) translate
+
+@) width: browser window; device-width: screen
+ *) equal in mobile, since usually browser window is not resizable;
+
+@) aspect-ratio: width/height
+
+@) resolution: density of pixels to physical dimension;
+
+@) device-pixel-ratio: physical pixels/logical(reported/density-independent) pixels; 
+ *) when high resolution device reports device width as predecessor(pixel turns to logical), but pixel contains more than one physical pixels;
+ *) apple specific for retina; 
+ *) physical pixels=reported pixels*ratio:	real divice-width is divice-width*device-pixel-ratio;
+ *) dpr:window.devicePixelRatio (get physical pixcel from this);
+
+@) when orientation changes, apple devices don't swap 'device-width'/'device-height' as other venders;
+
+
+@) only when image is broken, it's ':before'/':after' takes effect;
