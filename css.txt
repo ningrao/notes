@@ -99,15 +99,14 @@ inline	->	id	->	attr & class	-> element & pseudo element
 
 @) 7 layouts: block, inline, table, positioned, column, flex, grid;
 
-@) flex
- *) disply:flex/inline-flex
+@) flex(disply:flex/inline-flex): to make content always fill container by growing/shrinking; items with the same dimension in cross-axis;
  *) items have equal size in cross axis as table-cell;
  *) no effect: column, float/clear, vertical-align, ::first*;
  *) direct text is wrapped in anonymous item;
  *) absolutely positioned child doesn't participate in the flex layout;
  *) percentage in padding/margin on item is not consistent across browsers;
  *) flex-basis: initial width before fill is applied, take precedence over 'width/height';
- *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space or shrinked space;
+ *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space appor shrinked space;
  *) if no flex-grow/shrink is specified, fill based on the propotion of their basis;
  *) align: justify-content/align-items
  *) flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
@@ -160,5 +159,8 @@ inline	->	id	->	attr & class	-> element & pseudo element
 
 @) when orientation changes, apple devices don't swap 'device-width'/'device-height' as other venders;
 
+@) zoom changes 'device-width';
+ *) by default mobile browser zoomed out to 980/800... , causing media query get fause values;  
+ *) meta: width=device-width to prevent default zooming;
 
 @) only when image is broken, it's ':before'/':after' takes effect;

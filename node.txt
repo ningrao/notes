@@ -137,16 +137,19 @@ general
  
 @) when deploy, either along with all dependencies or lock down them with shrinkwrap;
  
-@) require(): when load a directory, it checks:
+@) require(): 
+ *)	when load a directory, it checks:
 	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
-@) 
+ *) 
 require('pkg')	-> installed package 
  * find in paths in 'module.paths'
 require('./file')	-> local file
 
-@) require.main: the entry module;
-@) require.main.require('util/do'): starts from app root;
-@) 
+ *) require.main: the entry module;
+ *) require.main.require('util/do'): starts from app root;
+ *) 'json' file should has extension or it's treat as js file;
+ *) '.js' extension is omited only in relative path;
+ *) require.resolve returns the found path;
 
 @) secure ways:
  *) least priviledge for accounts;
@@ -281,7 +284,7 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 		*) fork: nodejs process
  *) response once after finished (suitable for application to compute result)
 	*) exec: subshell
-	*) execFile: background process
+	*) execFile: process
 
 @) path.resolve
  *) returns an absolute path; 

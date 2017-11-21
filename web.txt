@@ -174,7 +174,10 @@ tools & tech
 ------------------------------------------
 @) Esprima is a parser/metaprogramming tool for javascript;
 
-@) PhantomJS is a mocking environment browser;
+@) PhantomJS is a webkit browser without UI;
+ *) phantom.require can only resolve phantom-buitin module and absolute path files;
+ *) casperjs: if args exists in PhantomJS, then pass to it; or pass to itself;
+ *) overcome ssl error/bugs: --ignore-ssl-errors=true
 
 @) weex is a platform for mobile app(web can be converted to native);
 
