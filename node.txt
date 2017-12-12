@@ -140,16 +140,17 @@ general
 @) require(): 
  *)	when load a directory, it checks:
 	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
- *) 
-require('pkg')	-> installed package 
+ *) require('pkg')	-> installed package 
  * find in paths in 'module.paths'
-require('./file')	-> local file
+
+	require('./file')	-> local file
 
  *) require.main: the entry module;
  *) require.main.require('util/do'): starts from app root;
- *) 'json' file should has extension or it's treat as js file;
+ *) 'json' file should has extension or it's treated as js file; or read it manually with `file` api; 
  *) '.js' extension is omited only in relative path;
  *) require.resolve returns the found path;
+ *) `~` can not expand, use 'process.env.HOME' instead;
 
 @) secure ways:
  *) least priviledge for accounts;
@@ -191,6 +192,8 @@ require('./file')	-> local file
 @) async callback invocation is appended to the event loop; 
 
 @) give callback function a name for stack trace;
+
+@) console.trace() list stack trace;
 
 @) no thread can be created, instead apply child_process;
 
@@ -237,7 +240,14 @@ require('./file')	-> local file
 @) `node inspect` debug in cmd; 
 @) `node --inspect` debug in chrome DevTool; 
 
-@) `node debug` works more stably than `node inspect`  
+@) prevent copy&paste address to debug nodejs:
+
+	chrome://inspect/#devices -> open dedicated DevTools for Node
+
+
+@) `node debug` may work more stably than `node inspect` in some version or some api, or vice versa.
+
+@) pass debug argument before exec file when debug child process;
 
 @) when run in debug mode, don't redirect output like this:
 node debug path > file
@@ -291,7 +301,7 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
  *) the last supplied absolute path supersedes the formers (abandoned);
  *) if none is supplied, cwd is applied;
 
-@) url.resolve 
+@) url.resolve vs url. 
 
 @) --preserve-symlinks omit 'main' file (entry file);
 

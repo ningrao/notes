@@ -107,6 +107,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) percentage in padding/margin on item is not consistent across browsers;
  *) flex-basis: initial width before fill is applied, take precedence over 'width/height';
  *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space appor shrinked space;
+ *) flex-wrap:wrap; grow/shrink no need to exist;
  *) if no flex-grow/shrink is specified, fill based on the propotion of their basis;
  *) align: justify-content/align-items
  *) flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
@@ -164,3 +165,5 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) meta: width=device-width to prevent default zooming;
 
 @) only when image is broken, it's ':before'/':after' takes effect;
+
+@) styleint: turn off a rule, set value to null;

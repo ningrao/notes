@@ -9,6 +9,13 @@ can route with plain link?
 
  *) when a new version is issued, the old one is withdrawn automatically;
 
+ *) regex
+ 	`(?:.*)` - non-capturing
+ 	`.*?=` - lookahead positive
+ 	`.*?!` - lookahead negative
+ 	`?<=.*` - lookbehind positive
+ 	`?<!.*` - lookbehind negative
+
  *) stages:
 stage-0 - Strawman: just an idea, possible Babel plugin.
 stage-1 - Proposal: this is worth working on.
@@ -133,16 +140,17 @@ numeric(ascending) -> string(appear) -> symbol(appear);
 	.) 'g': lastIndex and forward
 	.) 'y': lastIndex (not to forward)
  *) [tagged] template literal (backquotes):	
-	 function filterFun(parts, ...substitutes){
-	 };
+	 function filterFun(parts, ...substitutes){};
 		**) parts always have more than one elements than substitutes;
-	 let str1=filterFun`abc ${expr}
-			 123`
 	.) new line is allowed;
+		```
+		 let str1=filterFun`abc ${expr}
+				 123`;
+		```
 	.) filterFun is a filter function; 
 		=> filterfun('abc ', expr, '\n123')
 	.) expr can be any valid R-value;
-	.) evaluate at runtime: wrapped in afunction: 
+	.) to evaluate at runtime: wrapped in a function: 
 		function reusable(a, b) {
 			  return `a is ${a} and b is ${b}`;
 		}
@@ -416,6 +424,14 @@ run(tasks).then(function(rs){
 	export default name1;
 	import name2 from ...;
 
+@) `export from`
+	default value can not be reexported as default: 
+
+ * `export * from ''`  
+ 	imported default value is **discarded**.
+
+ * `export name from ''`  
+	imported default value is exported as **property**.
 
 -----------------------------------------------------------------------------------------
 GENERAL
@@ -651,11 +667,12 @@ initial-scale - visual viewport
  *) setState accept json, which is mixined to previous one, the ones being not overridden are not touched;
  *) PureComponent apply shadow comparison in shouldComponentUpdate(); pass new object when property changed;
  *) parent re-render will trigger descendents re-render;
- *) 6 lifecycle events: componentWillMount/componentDidMount/componentWillUpdate/componentDidUpdate/componentWillReceiveProps/componentWillUnmount/;
+ *) 6 lifecycle events: componentWillMount/componentWillReceiveProps/(shouldComponentUpdate)/componentWillUpdate/componentDidUpdate/componentDidMount/componentWillUnmount/;
  	.) componentWillReceiveProps
 		..) props may be the same(parent rerender);
-		..) only changed props are passed;
-		..) not trigger in mounting;
+		..) not triggered in mounting;
+  .) componentWillUpdate
+    ..) can not call setState.
  *) preventDefault instead of 'return false';
  *) prop.children represents passed html;
  *) fetch for ajax;

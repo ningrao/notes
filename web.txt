@@ -176,8 +176,12 @@ tools & tech
 
 @) PhantomJS is a webkit browser without UI;
  *) phantom.require can only resolve phantom-buitin module and absolute path files;
- *) casperjs: if args exists in PhantomJS, then pass to it; or pass to itself;
  *) overcome ssl error/bugs: --ignore-ssl-errors=true
+
+@) casperjs
+ *) if args exists in PhantomJS, then pass to it; or pass to itself;
+ *) waitFor() is a spinning, call callback repeatedly;
+ *) get output from client by message;
 
 @) weex is a platform for mobile app(web can be converted to native);
 
@@ -328,6 +332,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 		amd: 'react'
 	},
  }
+ *) plugins:
+ 	* an object or function; `apply` of which is called with `compiler`;
 
 
 ------------------------------------------
@@ -380,6 +386,7 @@ https://www.w3.org/TR/2010/WD-html5-diff-20101019/#changes-2010-06-24
 
  *) CommonJS (sync): exports is an object predefined (which can not be changed as cjs2), output can only be appended to it;
 ```
+Invalid:
 	exports={};
 ```
 
@@ -493,6 +500,7 @@ this.addEventListener('fetch', function(event) {
 	*) when linting ignored file error: "eslint file ignored by default use a negative ignore pattern"
  *) shared-node-browser: only those common in both; 
  *) commonjs: require, exports and module
+ *) globals: bool, whether writable
  *) turn off/on with Inline Comments
  	.) /*eslint-disable/enable no-console, no-alert*/
  	.) //eslint-disable-line no-console, no-alert
@@ -536,7 +544,7 @@ this.addEventListener('fetch', function(event) {
  *) if 'block third party cookie' is enabled, codes in another domain run in 'third-party' scenario have **no access** to its own cookies;
  *) open new window to turn to 1st party to overcome restriction;
 
-@) babel-preset-es2015/env: modules:false to prevent converting es6 modules to commonjs modules for webpack tree-shaking working;
+@) babel-preset-es2015/env: modules:false to prevent converting es6 modules to commonjs modules for webpack tree-shaking(remove unused `export`ed) working;
 
 @) 'react-test-renderer' is desined for snapshot test;
  * version should match with React; 
@@ -544,10 +552,6 @@ this.addEventListener('fetch', function(event) {
 	renderer16 & react15:
 
 	`TypeError: Cannot read property 'ReactCurrentOwner' of undefined`
-
-@) prevent copy&paste address to debug nodejs:
-
-	chrome://inspect/#devices -> open dedicated DevTools for Node
 
 @) source map may cause debugging problem;
 
