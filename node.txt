@@ -138,6 +138,8 @@ general
 @) when deploy, either along with all dependencies or lock down them with shrinkwrap;
  
 @) require(): 
+  * dynamic module, e.g. load at runtime;
+
  *)	when load a directory, it checks:
 	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
  *) require('pkg')	-> installed package 

@@ -365,6 +365,9 @@ run(tasks).then(function(rs){
 ----------------------------------------------
 --	MODULE
 ----------------------------------------------
+@) static, e.g. load at compile time
+ * import(), proposed dynamic import function.
+
 @) module/script are distinguished by loading method, instead of itself;
  *) script tag with type='module', whether src is present or not(inline); 
  *) new Worker(path, {type:'module'});

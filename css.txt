@@ -167,3 +167,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
 @) only when image is broken, it's ':before'/':after' takes effect;
 
 @) styleint: turn off a rule, set value to null;
+
+@) custom properties is used for configing of component which defines properties.
+
+@) precss focuses on syntax; cssnext focuses on new styles.

@@ -333,7 +333,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 	},
  }
  *) plugins:
- 	* an object or function; `apply` of which is called with `compiler`;
+ 	* an object, with a method named 'apply' being called with `compiler`;
+  * Function is a builtin Object of this type.
 
 
 ------------------------------------------
@@ -346,6 +347,8 @@ general
 
 @) immutable object makes diff easier by replace comparing object content with comparing object address;
  *) if a field is changed, a new object is returned;
+
+@) bail: return 'money' as security or will fail.
 
 @) HTML5 differences from HTML4 
 https://www.w3.org/TR/2010/WD-html5-diff-20101019/#changes-2010-06-24
