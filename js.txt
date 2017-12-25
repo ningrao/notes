@@ -392,6 +392,8 @@ run(tasks).then(function(rs){
  	export let name;
  *) after declare:
  	export {name};
+ *) default exported value is placed in a field named 'default';
+
  *) export what imported:
  	*) import field, export field;
 		export {name1 as Name1, name2} from path
@@ -419,13 +421,7 @@ run(tasks).then(function(rs){
 
  *) imported name is readonly; but can be modified inside that module, which will be reflected to binding; 
 
-@@@) default vs all:
- *) import name from '';	--default export, not all exports;
- *) import * as name from '';	--all exports wrapped in 'name';
-
-@) default export/import name can be whatever, and no need to match;
-	export default name1;
-	import name2 from ...;
+@) default value is included in `import * from` but not in `export * from`;
 
 @) `export from`
 	default value can not be reexported as default: 
@@ -434,7 +430,10 @@ run(tasks).then(function(rs){
  	imported default value is **discarded**.
 
  * `export name from ''`  
-	imported default value is exported as **property**.
+	imported default value is exported as **property** of 'name'.
+
+ * `export default from ''`  
+	imported default value is exported as default.
 
 -----------------------------------------------------------------------------------------
 GENERAL
