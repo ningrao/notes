@@ -748,7 +748,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 		..) mapDispatchToProps(dispatch, [ownProps]):{actionCreator(args){}}: only 'dispatch'; helper redux.bindActionCreators()
 		xxx..) {actionCreator(args)=>((dispath, getState)=>{})}: 'dispatch' and 'getState';
 	.) some array/immutable functions (reduce, map...) always return new object, deep compare before return (lodash.isEqual);
- *) reduce-reducers.js: [reducer].reduce();
+ *) reduce-reducers.js: the whole state is passed to all reducers (instead of pass corresponding slice as combineReducer);
  *) redux-immutable.js: make redux recongize its store as an Immutable.Collection;
  *) Immutable.js
 	.) toJs(): always returns new object(expensive);
@@ -761,7 +761,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  *) state depends on another:
  	 .) pass in action
 	 .) combine as a single
-	 .) root state reducer: reduceReducers(combineReducers(...), (rootState, action)=>{})
+	 .) whole state as a single (the last root reducer): reduceReducers(combineReducers(...), (rootState, action)=>{})
 	 .) remove from store, calc in container, but with memoization (reselect); 
 
  *) reselect
