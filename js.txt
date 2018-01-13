@@ -394,6 +394,8 @@ run(tasks).then(function(rs){
  	export let name;
  *) after declare:
  	export {name};
+ *) default exported value is placed in a field named 'default';
+
  *) export what imported:
  	*) import field, export field;
 		export {name1 as Name1, name2} from path
@@ -421,13 +423,7 @@ run(tasks).then(function(rs){
 
  *) imported name is readonly; but can be modified inside that module, which will be reflected to binding; 
 
-@@@) default vs all:
- *) import name from '';	--default export, not all exports;
- *) import * as name from '';	--all exports wrapped in 'name';
-
-@) default export/import name can be whatever, and no need to match;
-	export default name1;
-	import name2 from ...;
+@) default value is included in `import * from` but not in `export * from`;
 
 @) `export from`
 	default value can not be reexported as default: 
@@ -436,7 +432,10 @@ run(tasks).then(function(rs){
  	imported default value is **discarded**.
 
  * `export name from ''`  
-	imported default value is exported as **property**.
+	imported default value is exported as **property** of 'name'.
+
+ * `export default from ''`  
+	imported default value is exported as default.
 
 -----------------------------------------------------------------------------------------
 GENERAL
@@ -751,7 +750,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 		..) mapDispatchToProps(dispatch, [ownProps]):{actionCreator(args){}}: only 'dispatch'; helper redux.bindActionCreators()
 		xxx..) {actionCreator(args)=>((dispath, getState)=>{})}: 'dispatch' and 'getState';
 	.) some array/immutable functions (reduce, map...) always return new object, deep compare before return (lodash.isEqual);
- *) reduce-reducers.js: [reducer].reduce();
+ *) reduce-reducers.js: the whole state is passed to all reducers (instead of pass corresponding slice as combineReducer);
  *) redux-immutable.js: make redux recongize its store as an Immutable.Collection;
  *) Immutable.js
 	.) toJs(): always returns new object(expensive);
@@ -764,7 +763,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  *) state depends on another:
  	 .) pass in action
 	 .) combine as a single
-	 .) root state reducer: reduceReducers(combineReducers(...), (rootState, action)=>{})
+	 .) whole state as a single (the last root reducer): reduceReducers(combineReducers(...), (rootState, action)=>{})
 	 .) remove from store, calc in container, but with memoization (reselect); 
 
  *) reselect

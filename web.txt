@@ -255,6 +255,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 @) webpack
  *) v2 support es6 module natively;
  *) target environment:	target: 'node'/'web'(default)/...
+ *) `@import`ed css file is not `test`ed as a module, it's part of host file.
+ *) all matched tests are executed.
  *) return array of config to output several bundling for once;
  *) use 'define' plugin to set global variable from file for conditional build along with uglify;
  	..) value can be a installed module name;
@@ -306,7 +308,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
  *) 'eslint-loader' options is which that will be passed to 'CLIEngine', general config is still required if needed;
  *) 'hash' is a random number in each compile; 'chunkhash' is calculated from file; 
  *) require('webpack-merge')
- 	.) smart:  to merge loaders&options against 'test' and other fields which are all equal;
+ 	.) smart:  to merge loader options against 'test' and other fields which are all equal;
 	.) strategy/smartStrategy: key rules;
 	.) merge({customizeArray, customizeObject}); customizing;
  *) on-demand loading: import('');
@@ -574,3 +576,9 @@ this.addEventListener('fetch', function(event) {
 @) <script>
 	* async: loading side by side with parsing, pause parsing when execute; 
 	* defer: async loading and defer executing after parsing is complete (order is respected);
+
+@) travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
+
+@) new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
+
+@) postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
