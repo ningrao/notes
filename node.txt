@@ -251,6 +251,7 @@ general
 
 @) pass debug argument before exec file when debug child process;
 
+
 @) when run in debug mode, don't redirect output like this:
 node debug path > file
 
@@ -310,3 +311,8 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 @) debug inline: `node inspect[-brk]`
 
 @) debug in chrome: `node --inspect[-brk]`
+
+@) remove module cache:
+`delete require.cache[require.resolve('name')]`
+
+@) require loads file with `require('module')._load`.
