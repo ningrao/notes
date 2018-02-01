@@ -244,10 +244,12 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 
 @) Promise
  *) in executor, error thrown(implicit try/catch exists) or passed to reject is passed to 'catch';
- *) resolve()/reject() creates a resolved/rejected promise, passed to corresponding handler;
-	.) when a 'promise' is passed, it is returned unmodified;
-	.) if an object with 'then' method is passed, 'then' is called as the new promise's executor;
-	.) if no reject handler, then passed to 'catch', if no 'catch', passed to global promise handler, if still none, error unhandled;
+ *) the rejected value, if no reject handler, is passed to 'catch', if no 'catch', then passed to global promise handler, if still none, error unhandled;
+ *) resolve()/reject() creates a resolved/rejected promise, passed the parameter as result to corresponding handler;
+	**) if an object with 'then' method is passed, 'then' is called as the new promise's executor;
+	**) 'promise' as the parameter
+    *) resolve() relay it as the returned promise.
+    *) reject() still treat it as the result to reject handler.
  *) then(onResolve, onReject) / catch(onReject) returns a new promise;
 	.) when error is thrown, the new promise is rejected;
  	.) returned value in both handler is passed to the new promise resolve();
@@ -515,19 +517,19 @@ Reflect.ownKeys()	--string+symbol
  *) default iterator generator used for 'for...of' has the function name '[Symbol.iterator]';
  *) types with builtin generator:
 	 .) collections(array,map,set): entries(),values(),keys(); default: map(entries), array/set(values)
- *) the param passed to 'next()' is returned by the previous yeild, which is the first command to execute:
+ *) the param passed to 'next()' is returned by the previous yield, which is the first command to execute:
  	function *iteratorCreator(){
-		let nextParam=yeild 1;
+		let nextParam=yield 1;
 		let nextParam+=10
-		yeild nextParam;
+		yield nextParam;
 	}
 	let it=iteratorCreator();
 	it.next()	-> 1
 	it.next(5)	-> 15
- *) if yeild is not assigned to a variable, it.throw(new Error()) will not trigger error;
+ *) if yield is not assigned to a variable, it.throw(new Error()) will not trigger error;
  *) when no 'yield' left, 'next()' returns {value:returnValue, done:true}; 'returnValue' is returned by 'return';
- *) when an iterator generator is 'yeild'ed, this code line is replaced with codes in the generator;
- 	.) the syntax '*gen()' is only valid when following 'yeild';
+ *) when an iterator generator is 'yield'ed, this code line is replaced with codes in the generator;
+ 	.) the syntax '*gen()' is only valid when following 'yield';
 	function *createNumberIterator() {
 		yield 1;
 		yield 2;

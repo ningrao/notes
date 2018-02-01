@@ -248,6 +248,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
  *) babel-node: put in babel-polyfill and call babel-register internally;
  *) doesn't bundle, so es6/cjs import/export let it is. (es6 module syntax can be converted to other)
  *) 'env/es' should be placed before 'stage-*';
+ *) 'ignore' is normalized into 'array', env is deep merged. **can not override**
 
 @) json5
  *) comment
