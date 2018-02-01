@@ -254,6 +254,10 @@ general
 @) when run in debug mode, don't redirect output like this:
 node debug path > file
 
+@) view long strings when debug:
+  exec console.error(longString);
+
+
 @) redirect console output:
 	node path 1>file
 

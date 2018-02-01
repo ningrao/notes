@@ -222,6 +222,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 @) Constructor.prototype[Symbol.toStringTag] determines what returned by Object.prototype.toString.call(inst); which is also the result of Constructor.prototype.toString if not overriden;
 
 @) Set
+ *) unique
  *) no index
  *) Object.is() to check duplicate;
  *) duplicate value is dropped silently;
@@ -234,9 +235,12 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 
 @) Map
  *) not to coerce key into string as object;
- *) WeakMap only applies to key; value still can be any type;
+ *) WeakMap only applies 'weak' to key; value still can be any type;
 
-@) no way to check if WEAK Collection is empty;
+@) WEAK Collection: for 'Tag' an object
+ *) only able to check if an object exists (tag the object with this set);
+ *) no way to check if is empty;
+ *) automate garbage collection;
 
 @) Promise
  *) in executor, error thrown(implicit try/catch exists) or passed to reject is passed to 'catch';
@@ -354,6 +358,8 @@ run(tasks).then(function(rs){
  *) typeof() defined class is 'function';
  *) always call 'super(args)' as the first line in constructor of derived class;
  *) return value in constrcutor works as es5;
+ *) derived class calls base constructor if no constructors defined.
+ *) class properties initialization is placed in the last of contructor.
 ----------------------------------------------
 --	ES7
 -----------------------------------------------------------------------------------------
@@ -665,6 +671,7 @@ initial-scale - visual viewport
  *) state only available to component defined by class;
  *) state: variables(mutable), used in render() for model tracking by 'setState()';
  *) setState is async, read 'state' when calling it may get a staled value(other setState is cached); instead pass function to setState: (prevState, props)=>({});
+    * get mutated state in componentWillUpdate;
  *) setState triggers render(), if shouldComponentUpdate() returns true(always by default);
  *) setState accept json, which is mixined to previous one, the ones being not overridden are not touched;
  *) PureComponent apply shadow comparison in shouldComponentUpdate(); pass new object when property changed;
@@ -706,7 +713,9 @@ initial-scale - visual viewport
 	.) location.key is an id;
 	.) react-router-redux: save route/url in store for replaying states(normally url is a separate source along with store for component props);
 	.) Switch: first matched, exclusive (when not in it routes matched are all rendered);
+    * what ever child with props of 'path' or 'from';
 	.) react-router-dom for browser; react-router-native for server; react-router-server for server; react-router is fundametal; 
+  .) Redirect should not be rendered if not matched, or it will update and cause error 'You tried to redirect to the same route you're currently on', so always place it in Switch.
  *) context:
  	.) childContextTypes and contextTypes are necessary;
 	.) can be relayed;
