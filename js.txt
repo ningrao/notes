@@ -295,10 +295,10 @@ run(tasks, function(err, rs){
 	}
 });
 
-**) generator will be replaced with 'async', yield with 'await';
 -----------------------------------------------------------------
 
  *) promise(call next() in the previous promise fulfill handler):
+  ** is es7, to handle promise (converted to promise): generator '*' is replaced with 'async', yield with 'await' **
 -----------------------------------------------------------------
 function act1(str){
 	console.log('act1 arg1 is:'+str);
@@ -394,18 +394,18 @@ run(tasks).then(function(rs){
  	export let name;
  *) after declare:
  	export {name};
- *) default exported value is placed in a field named 'default';
-
- *) export what imported:
- 	*) import field, export field;
-		export {name1 as Name1, name2} from path
-	*) import default, export as named field;
-		export name from path
-	*) import default, export as default;
-		export default from path
  *) export default:
 	.) export default val1=1; (**declare is invalid: `export default let a=1`**)
 	.) export {val1 as default}; (**val1 is substituted with name 'default' when `import *`**)
+  .) default exported value is placed in a field named 'default'; so `import sth from` is short for `import {default as sth} from`
+
+*) export what imported:
+  *) import field, export field;
+    export {name1 as Name1, name2} from path
+  *) import default, export as named field;
+    export name from path
+  *) import default, export as default;
+    export default from path
 
 @) imort:
  *) only execute once no matter how many times it's imported;
@@ -520,6 +520,8 @@ Reflect.ownKeys()	--string+symbol
 	let it=iteratorCreator();
 	it.next()	-> 1
 	it.next(5)	-> 15
+  ** the second next() pass data to the first yield. **
+
  *) if yield is not assigned to a variable, it.throw(new Error()) will not trigger error;
  *) when no 'yield' left, 'next()' returns {value:returnValue, done:true}; 'returnValue' is returned by 'return';
  *) when an iterator generator is 'yield'ed, this code line is replaced with codes in the generator;

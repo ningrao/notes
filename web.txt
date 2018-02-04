@@ -582,3 +582,10 @@ this.addEventListener('fetch', function(event) {
 @) new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
 
 @) postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
+
+@) test tools
+  * change loaded module, get global variables: rewire/babel-plugin-rewire(es6);
+  * shim modules (mock require): mock-require/proxyquire/mockery
+  * all `describe` in all files are executed before executing `test/it`;
+@) mocha
+ * instance in higher level hook is prototype of that in lower level.
