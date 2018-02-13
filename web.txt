@@ -1,11 +1,9 @@
-=====================================================
 standards
 https://www.w3.org/WebPlatform/WG/PubStatus
 https://w3c.github.io/html/
 https://w3c.github.io/ServiceWorker/
 jsdoc:
 http://usejsdoc.org
-=====================================================
 W3C spec
  *) levels:
  1st) WD(working draft): published for public review; maybe have significant modification later;
@@ -16,7 +14,6 @@ W3C spec
  *) Normative: details implementors should conform to;
  *) Informative: examples and explanations;
  
-=====================================================
 @) OWASP: Open Web App Security Project
 https://www.owasp.org
 
@@ -593,3 +590,635 @@ this.addEventListener('fetch', function(event) {
 @) mocha
  * instance in higher level hook is prototype of that in lower level.
  * this.timeout() in before/beforeEach only affects itself. however affects all tests residing in a describe if placed in it.
+=======
+=====================================================
+standards
+https://www.w3.org/WebPlatform/WG/PubStatus
+https://w3c.github.io/html/
+https://w3c.github.io/ServiceWorker/
+jsdoc:
+http://usejsdoc.org
+=====================================================
+W3C spec
+ *) levels:
+ 1st) WD(working draft): published for public review; maybe have significant modification later;
+ 2nd) CR(candidate recommendation): ensure its implementability among development community; significant features are mostly decided;
+ 3rd) PR(proposed recommendation): submitted to w3c advisory council for final approval; last call for feedback;
+ 4th) REC(recommendation): ready for deployment to public;
+ *) standards may define levels of conformance for developer to follow; 
+ *) Normative: details implementors should conform to;
+ *) Informative: examples and explanations;
+ 
+=====================================================
+@) OWASP: Open Web App Security Project
+https://www.owasp.org
+
+@) HOL(Head of Line) blocking: in FIFO sequence processing, the first in the task line blocks those after it;
+ *) input buffered network switches; 
+ *) out-of-order delivery;
+
+@) test pyramid: ratio of amount of tests between the three types(from top to bottom):
+	end-to-end	->	intergration	-> unit
+
+@) header Content-Security-Policy: specify valid resources uri;
+
+@) normalized table:
+ 1st) primary key; atomic value; no repeating columns(value1, value2, value3...);
+ 2nd) non-key columns depends on primary key;
+ 3rd) the dependency is non-transitive(doesn't rely on a third column in the middle: personId->weight->isOverweight)
+
+@) higher-order-sth: a function which accepts some 'sth' as parameters and returns a new 'sth'; 
+------------------------------------------
+architecture & design
+------------------------------------------
+@) angular1(framework)
+ *) html-centric;
+ *) two-way data-binding;
+ *) dependency injecting;
+ *) custom element(directive);
+ *) builtin unit testing;
+ *) dirty-check for model change detection;
+ *) cons:
+ 	.) dirty-check is slow;
+ 	.) may have cascading update, when one change triggers other changes, watchers and digest cycle may run multiple times for dirty-check;
+
+@) angular2(framework)
+ *) mobile oriented
+ *) native support(NativeScript)
+ *) component driven(substitutes directive&controller); 
+ *) Hierarchical Dependency Injection
+ *) change detection 
+ 	 .) zone.js
+	 .) unidirectional tree based 
+	 .) observable&immutable
+ *) route load on-demand;
+ *) independent on runtime environment;
+ *) i18n support;
+ *) data from top to bottom, event bubbles up;
+ *) server side rendering(Universal Angular 2);
+
+@) react(library for view)
+ *) js-centric(jsx);
+ 	.) view is coupled with logic;
+	.) not intuitive;
+	.) transpile;
+	.) non-standard;
+ *) functional components(stateless, immutable data/object, no side-effects, same input same output) -- hot reloading;
+ *) virtual dom abstraction(only data for constructing the dom);
+ 	Component(stateful)	------>	Element(stateless/immutable)	-------> HTML DOM
+						(diff)
+ *) pros:
+ 	.) to build view in programming way;
+	.) model observable instead of dirty-check(only for dom);
+	.) ecosystem is mature;
+	.) virtual-dom can be rendered in server;
+	.) plugin for two-way binding/promises;
+ *) cons: 
+ 	.) plugins are required for other tasks, incurs inconsistency; 
+ 	.) root state changes cause child components re-render, unless 'shouldComponentUpdate' is correctly implemented; 
+	.) component scoped style in js or manipluate class name;
+	.) virtual-dom is memory consuming;
+
+@) react native(react for mobile)
+
+@) flux(architecture): redux, facebook, reflux, alt...;
+ *) unidirectional data flow: view doesn't modify model;
+ *) bypassing data flowing through components hierarchy, managing states outside the root component;
+ action -> dispatcher -> store -> view
+ 	|		(user interaction)		|
+	<--------------------------------
+ *) cons: 
+ 	.) hard to scale;
+
+@) vue(library for view)
+ *) html-centric;
+ *) functional components;
+ *) virtual dom abstraction(snabbdom);
+ *) two-way;
+ *) pros:
+ 	.) components dependencies are tracked(parsing text of function for property setting and getting);
+	.) component scoped css in a single file or css module or preprocessor(name prefix);
+ *) cons: 
+ 	.) 
+
+
+
+@) web component(standard for module):
+ *) custom element life cycle events: connected/disconnected/attributeChanged/adopted;
+ *) shadow dom
+ *) html import
+ *) template & slot
+ *) pros:
+ 	.) native
+	.) open & portable
+	.) encapsulate js/style;
+
+@) polymer(library for web component):
+
+@) polymer Toolbox(archetecture): app-layout + app-route + app-localize-behavior + app-storage + app-localize-behavior
+ *) features are encapsulated and represented as custom element;
+
+@) ember(framework)
+ *) full feature;
+ *) apply handlebar template;	 
+ *) requires library(jquery) for dom manipulating;
+ *) setter for detecting model changes;
+ *) two-way
+ *) cons: 
+ 	.) opinionated
+	.) heavy
+
+@) backbone(framework)
+ *) pros: 
+ 	.) light
+ *) cons: 
+ 	.) no template
+	.) refreshing model&view is achieved manually; 
+
+@) knockout
+ *) mvvm;
+ *) observables;
+ *) cons: 
+ 	.) no component;
+
+@) underscore(library for utility)
+ *) template
+	 
+
+@) Progressive Web App(Progressive enhancement, Responsive, Connectivity independent, App-like, Fresh, Safe, Discoverable, Re-engageable, Installable, Linkable)
+
+@) isomorphic/universal web app: Client+Server MVC, share codes between client and server;
+ *) isomorphic.net;
+ *) frameworks/library: Meteor, Rendr... 
+ *) server renders once, then leave for client side;
+ *) application logic; 
+ *) abstraction:
+ 	.) Route uniforms 'window.location' with 'request/response'(director...);
+	.) Data from model or uri(superAgent...);
+	.) HTML got without browser support;
+	.) build separate codes for client;
+
+@) foundation: equivalent to bootstrap;
+
+@) Cordova is base of PhoneGap(which is adapted by Adobe);
+
+------------------------------------------
+tools & tech
+------------------------------------------
+@) Esprima is a parser/metaprogramming tool for javascript;
+
+@) PhantomJS is a webkit browser without UI;
+ *) phantom.require can only resolve phantom-buitin module and absolute path files;
+ *) overcome ssl error/bugs: --ignore-ssl-errors=true
+
+@) casperjs
+ *) if args exists in PhantomJS, then pass to it; or pass to itself;
+ *) waitFor() is a spinning, call callback repeatedly;
+ *) get output from client by message;
+
+@) weex is a platform for mobile app(web can be converted to native);
+
+@) coffeescript is language sugar;
+
+@) hyperscript is a tool to create doms in js;
+
+@) bundler:
+ *) webpack(https://webpack.github.io/docs)
+	pros:
+	.) amd & cjs & global;
+ 	.) hot module replacement;
+	.) code splitting;
+	cons:
+	.) only support js files natively, other format requres loaders;
+	.) config too much;
+
+ *) browserify
+ 	.) set js alternative version for browser in package.json
+	pros:
+	.) json is supported;
+	.) no config and plugin is needed when conforming to convention; 
+	cons:
+	.) only support commonJS module;
+
+@) bower: download js modules;
+
+@) memoization: cache function result for recalling;
+
+@) ORM is object-relatinal mapping, database tool;
+
+@) protractor: e2e tester for angular, based on selenium and jasmine; 
+
+@) selenium for e2e; karma for unit;
+
+@) grunt-cli(global) is a tool which invoke grunt(local) in current directory;
+ *) task is a function defined directly(registerTask/registerMultiTask) or from a plugin();
+ *) returns false to fail the task;
+ *) config is queried in json defined in initConfig with the same name;
+ *) extra arguments can be passed, seperated with colon;
+ *) arbitrary properties defined in initConfig can be accessed in template or by 'grunt.config.get()';
+ *) load plugin tasks with blob by plugin 'load-grunt-tasks';
+grunt.initConfig({
+	task1:{
+		tar1:[1,2]
+		,tar2:{a:1, b:2}
+	}
+});
+grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
+	this.name	-> 'task1'
+	this.target	-> 'tar1'
+	this.data	-> [1,2]
+	arg1	-> 'a1'
+	arg2	-> 'a2'
+});
+> grunt task1:tar1:a1:a2
+
+@) babel
+ *) in '.babelrc', 'env' is merged shallowly.
+ *) only transform syntax, new globals(Promise) and new native methods need polyfill;
+ *) preset is a collection of sharable configs for an array of plugins; itself has to be installed;
+ *) 'env' preset can load correct plugins according to the specified target browsers;
+ *) babel-register: overwrite 'require' to compile nodejs files on the fly;
+ *) babel-node: put in babel-polyfill and call babel-register internally;
+ *) doesn't bundle, so es6/cjs import/export let it is. (es6 module syntax can be converted to other)
+ *) 'env/es' should be placed before 'stage-*';
+ *) 'ignore' is normalized into 'array', env is deep merged. **can not override**
+
+@) json5
+ *) comment
+ *) no quotes(valid identifier), single quote;
+
+@) tapable stores plugins in `_plugins`
+
+@) webpack
+ *) all processings are subscribed as event handlers/plugins. (default actions are set in 'WebpackOptionsApply.js')
+ *) v2 support es6 module natively;
+ *) target environment:	target: 'node'/'web'(default)/...
+ *) `@import`ed css file is not `test`ed as a module, it's part of host file.
+ *) all matched tests are executed.
+ *) return array of config to output several bundling for once;
+ *) use 'define' plugin to set global variable from file for conditional build along with uglify;
+ 	..) value can be a installed module name;
+ *) css imported is inserted in to html as <style>; or employ 'extract-text-webpack-plugin' to extract them into a css file;
+ *) './' required in 'entry' if relative
+ *) '-p' flag only set NODE_ENV for compiled code; set this in command line preceding 'webpack' for tool itself;
+ *) special chars in file names may cause problems;
+ *) Rule.use == Rule.loaders
+ *) output.path vs output.publicPath:
+	**) path is where files reside(imperative to be absolute), publicPath is where browser access those files(routing done by server);
+	**) url composed is resolved with publicPath;
+	**) webpack-dev-server has to know how to route, '/' is assumed by default;
+	**) publicPath should has trailing '/';
+ *) webpack-dev-middleware/[webpack-hot-middleware] injects webpack-dev-server into connect-app;
+ *) loaders dependency (adopt 'enforce' to ensure order);
+	**) 'loader!dependLoader'
+	**) [loader, dependLoader]
+ *) css-loader: css -> js; (has to be used with other plugins: extract(file)/style(tag))
+	 *) css-loader/locals: only return module name mapping without file emitting;
+ *) style-loader: insert <style> into html which includes this js module; **don't work in ssr**
+ *) url-loader: embed image data in url(if size larger than 'limit' when which is set, file-loader is applied);
+ *) file-loader: copy file and adjust url; 'emitFile=false' only return path(already done in client built in isomorphic app);
+ *) html-loader: parse attr and minify...;
+ *) html-webpack-plugin: inject assets in created/existing html entry file;
+ *) extract-loader: pass content as string to next loader;
+ *) extract-text-webpack-plugin: save css to files;(extract method exist both on instance and class);
+ *) bootstrap logic exist in each entry;
+ *) manifest code can change each build;
+ *) CommonsChunkPlugin extract codes, if duplicate then filter;
+ 	.) the chunks collection is parsed and modified by a definition once; 
+		.) the latter one work on what is left by the previous one;
+		.) the current chunk is the only entry (contains bootstrap);
+ 	.) chunks: from where to extract
+	.) minChunks:
+		.) number: presence in chunks; (Infinity	-- only populate bootstrap logic;)
+		.) function: custom criteria;
+		.) default: 
+ 	.) array: names or more instances;
+	.) bootstrap logic is placed in the last chunk;
+	.) if nothing left, this common chuck is dropped;
+	.) if entry has nothing left, only thunk exist;
+	.) extract all third-party libraries: minChunk:function(module, count){return module.resource && module.context.indexOf('node_modules')>-1;}
+	.) 'async': lazy load;
+ *) AggressiveSplittingPlugin/AggressiveMergingPlugin: divide/merge chunks (?not suitable for cache, only http2);
+ *) ProvidePlugin: ???;
+ *) DefinePlugin:define global constants;
+ 	.) accepts function;
+	.) if string, quotes is mandatory (JSON.stringify): {'process.env.name':'"str"'}
+ *) 'eslint-loader' options is which that will be passed to 'CLIEngine', general config is still required if needed;
+ *) 'hash' is a random number in each compile; 'chunkhash' is calculated from file; 
+ *) require('webpack-merge')
+ 	.) smart:  to merge loader options against 'test' and other fields which are all equal;
+	.) strategy/smartStrategy: key rules;
+	.) merge({customizeArray, customizeObject}); customizing;
+ *) on-demand loading: import('');
+ *) dynamic loading: require(variable); import doesn't work;
+ *) libaryTarget doesn't support es6;
+ *) "babel-plugin-" ("babel-plugin-transform-object-rest-spread") can be omited in config;
+ *) es6 exports that are required in commonjs are wrapped in an object, the default one is with key name 'default';
+ *) webpack-dev-server:
+	.) compiles file in memory;
+ 	.) allow host:	'--host 0.0.0.0' + 'disableHostCheck:true';
+	.) better set publicPath(&path) explicitly in development;
+	.) if none in memory, physical folder is checked then;
+	.) proxy appends matched path to target;
+	.) take precedence to historyApiFallback rewrites;
+	.) logLevel:debug in each route;
+	.) blob match rule;
+ *) lazy load in webpackv1, require.ensure([], (require)=>{}, outputPath)
+ *) 
+ externals:{
+	react: {
+		root: 'React',				// module.exports=window.React
+		commonjs2: 'react',			// module.exports=require('react')
+		commonjs: 'react',
+		amd: 'react'
+	},
+ }
+ *) output.library & libraryTarget
+ *) loaders:
+ *) plugins:
+ 	* an object, with a method named 'apply' being called with `compiler`;
+  * Function is a builtin Object of this type.
+
+
+ * 'WebpackOptionsApply.js' initialization
+ * Compiler
+  * resolvers: instances of `enhanced-resolver`
+  * compile(): runner
+
+ * Compilation (build in 'make' event, sources are available in this callback)
+    addEntry (SingleEntryDependency/MultiEntryDependency) -> _addModuleChain/addModuleDependencies() -> buildModule() -> NormalModule.build()
+  * dependencyFactories: handlers for dependencies(resolve path and loaders (loaders in path along with rules));
+   * NormalModuleFactory.js
+   * ContextModuleFactory.js
+  * _addModuleChain: load module and dependencies.
+ * NormalModule.js: Module object, method 'build' executes loaders, then parse ast.
+  * _source: file name and content;
+  * derive from Module <- DependenciesBlock
+ * parser.js parse ast;
+  * this.state.current is the module;
+  * add variables;
+  * add dependencies;
+  * each code of line can apply an event;
+ * loaders contains two types: pitch & normal. in first run, executes each pitch from low index up, until one returns non-undefined, then read the file and execute normal loaders from there down (not including itself). others are ignored.
+ loader         loader         loader         
+ pitch  ->      pitch      ->   pitch 
+                  ↓ (return non-undefined)            
+               (load file)
+ normal <-      normal   <-    normal
+ * loader is executed on 'loaderContext', which is created in NormalModule.createLoaderContext();
+
+ * styleloader.pitch returns rest loaders chain in require as a module. later they are be parsed as dependencies;
+  `require('cssloader....')`
+
+ * extract-text-webpack-plugin trigger rebuild in 'optimize-tree';
+                  
+@) postcss
+
+
+------------------------------------------
+general
+------------------------------------------
+@) what changes model:
+ *) event
+ *) xhr
+ *) timer
+
+@) immutable object makes diff easier by replace comparing object content with comparing object address;
+ *) if a field is changed, a new object is returned;
+
+@) bail: return 'money' as security or will fail.
+
+@) HTML5 differences from HTML4 
+https://www.w3.org/TR/2010/WD-html5-diff-20101019/#changes-2010-06-24
+
+@) module and dependency:
+ *) AMD(async): requirejs
+```
+	define([modB], function(){
+		return {};
+	});
+```
+
+ *) CommonJS 2(sync): nodejs
+```
+	let b=require('modB');
+
+	module.exports={};
+
+
+
+	function require(/* ... */) {
+	  const module = { exports: {} };
+	  ((module, exports) => {
+		// Module code here. In this example, define a function.
+		function someFunc() {}
+		exports = someFunc;
+		// At this point, exports is no longer a shortcut to module.exports, and
+		// this module will still export an empty default object.
+		module.exports = someFunc;
+		// At this point, the module will now export someFunc, instead of the
+		// default object.
+	  })(module, module.exports);
+	  return module.exports;
+	}
+```
+
+ 	.) an empty object is assigned at parse time; overridden at runtime by assigning to 'module.exports';
+
+ *) CommonJS (sync): exports is an object predefined (which can not be changed as cjs2), output can only be appended to it;
+```
+Invalid:
+	exports={};
+```
+
+ *) es6:
+ 	.) an empty object is assigned at parse time; values are added at runtime by 'export';
+
+ *) UMD(universal module defination: mixed of the above two with global variable);
+```
+(function webpackUniversalModuleDefinition(root, factory) {
+  if(typeof exports === 'object' && typeof module === 'object')
+    module.exports = factory();
+  else if(typeof define === 'function' && define.amd)
+    define("library", [], factory);
+  else if(typeof exports === 'object')
+    exports["library"] = factory();
+  else
+    root["library"] = factory();
+})(this, function() {
+return (function(modules) {
+ ...
+ ...
+```
+
+@) requirejs circular dependency resolution:
+ *) call require() in define(); (although it's empty, it is mandatory to add it in the dependency array as well)
+ *) apply CommonJS wrapper(no dependency array; access refed module property after this returns);
+
+@) in some browser, reload occurs when back from new pages opened by ways of browser, such as "open" or 'a'.
+
+*) transition will not work if that property changed has no initial value;
+
+*) setCustomValidity('') can't remove the builtin errors;
+
+@) when position:absolute, margin-top is respective to height in some browser;
+
+@) rt(ruby text), rp(ruby parenthesis)
+
+@) append codes to window created by 'window.open()'; 
+@) rotate3d(x,y,z,d):
+(x,y,z) is a point in 3d space, which combines with (0, 0, 0) as a line to define the rotate axis;
+
+@) origin is related to its original location before any tranforming applied;
+
+@) if duration between setting start css  and end is too short, transition may have no effect;
+
+@) transitionend fires for each property;
+
+@) to remove inline style, set an invalid value;
+
+@) http 1.0 defines authorization header format as:
+Authorization: <type> <credentials>
+ *) 'Bearer' type belongs to 'OAuth 2.0'; 
+
+@) nginx can handle TLS(Transport layer security);
+
+@) SSE: Server Send Event:
+ *) unidirectional
+ *) better set 'Cache-Control: no-cache';
+ *) MIME: text/event-stream
+
+@) WebSocket:
+ *) bidirectional;
+
+@) WebWorker:
+ *) 'WorkerGlobalScope' is the counterpart of 'window' in pages;
+ *) no sync issue, since data passed are copied;
+ *) importScript(path) to use external script;
+ *) can't load from other origin, even with CORS header set(module worker is an exception); 
+ *) alert counterpart is Notification;
+
+@) ServiceWorker(special webworker):
+ *) a proxy to intercept requests, scope is:
+ 	.) pages resides in the same directory(or under) of the worker scirpt file;
+	.) whatever requests those pages triggers(even another origin);
+	exceptions:
+	.) iframe & <object>
+	.) service worker update
+	.) requests in service worker;
+ *) return from 'caches' or result of a new request or whatever artifacts;
+ *) https only(importScript to get codes from wherever place);
+ *) installed worker: navigator.serviceWorker.controller
+ *) byte compare the script file in background to upgrade the worker; (new version takes effect only when all controlled pages in all tabs are closed; except .replace() is called in install);
+ *) bypass: shift+reload
+ *) work in background:
+ 	.) push: server initiates
+		self.onpush=function(){}/self.addEventListener('push', ...);
+	.) sync: agent initates; 
+
+this.addEventListener('fetch', function(event) {
+    event.respondWith(caches.match(cacheNames['static'], event.request.url).catch(function() {
+      return fetch(event.request); //relay of default request;
+    }));
+});
+
+@) offline app(superseded by ServiceWorker);
+ *) manifest file is a text file of whatever name with '.appcache' extension and 'text/cache-manifest' MIME type;
+ *) query string distinguishs different file; 
+ *) when a single file doesn't exist in manifest, the whole file is ignored;
+ *) no expiration date, except manifest changes;
+
+@) http2/SPDY
+ *) multiplex streams: all files in a single connection
+  * divided into binary frames sent asyncally.
+  * prioritizing
+ *) server push
+ *) header compression
+
+@) idempotant functions: the result is the same when execute more than one times;
+
+@) Clickjacking: cover page with an iframe, which hosts a third-party page which accept user inputs(click/type);
+ *) top!=window&&(top.location=window.location);
+ *) X-Frame-Options: Deny/SAMEORIGIN
+
+@) eslint:
+ *) dot file is ignored by default;
+	*) when linting ignored file error: "eslint file ignored by default use a negative ignore pattern"
+ *) shared-node-browser: only those common in both; 
+ *) commonjs: require, exports and module
+ *) globals: bool, whether writable
+ *) turn off/on with Inline Comments
+ 	.) /*eslint-disable/enable no-console, no-alert*/
+ 	.) //eslint-disable-line no-console, no-alert
+ 	.) //eslint-disable-next-line no-console, no-alert
+ *) support react:
+ 	.) parserOptions.ecmaFeatures.jsx:true
+	.) eslint-plugin-react (also support jsx formatting)
+		..) plugins:["react"]
+		..) extends:["plugin:react/all",...]
+
+ *) no-mixed-spaces-and-tabs: '=' format again;
+ *) no-case-declarations: 'let' in 'case', risk to break DMZ; wrap in {};
+ *) react/prefer-stateless-function: if only 'render' existes in component, adopt pure function style definition;
+ *) react/jsx-no-literals: place string in {};
+	**) [{"noStrings": true}]: no string literals at all; for ensuring translated;
+ *) react/jsx-no-bind: no nested function;
+ 	**anonymous function is not checked**
+ *) react/require-optimization: mandate shouldComponentUpdate, failed to check when (bugs):
+ 	.) if 'extends' from an alias
+	.）if has an arrow function method
+
+
+@) js-beautify
+ *) decode unicode escape sequence: -x
+ *) modify the orginal file: -r
+
+@) basic Authorization header:
+	Authorization: Basic btoa(username:password); 
+	> btoa: base64 encoding;
+@) when config file 'gulpfile.js' converted to 'gulpfile.babel.js', gulp executes after 'babel-register()';
+
+@) simple request (without preflight):
+ *) methods: GET, POST, HEAD
+ *) headers: Accept Accept-Language Content-Language Content-Type (but note the additional requirements below) Last-Event-ID DPR Downlink Save-Data Viewport-Width Width
+ *) Content-Type: application/x-www-form-urlencoded multipart/form-data text/plain
+ *) No event listeners are registered on any XMLHttpRequestUpload object used in the request.
+ *) No ReadableStream object is used in the request.
+
+@) third-party cookie: another domain in iframe/ajax
+ *) a looser extent than origin: only top domain difference (whatever subdomain/port/protocol is);
+ *) if 'block third party cookie' is enabled, codes in another domain run in 'third-party' scenario have **no access** to its own cookies;
+ *) open new window to turn to 1st party to overcome restriction;
+
+@) babel-preset-es2015/env: modules:false to prevent converting es6 modules to commonjs modules for webpack tree-shaking(remove unused `export`ed) working;
+
+@) 'react-test-renderer' is desined for snapshot test;
+ * version should match with React; 
+
+	renderer16 & react15:
+
+	`TypeError: Cannot read property 'ReactCurrentOwner' of undefined`
+
+@) source map may cause debugging problem;
+
+@) enzyme
+	* shallow: no instances in desendants;
+	* equals: full props match
+	* matchesElement: subcollection of props match;
+	* call wrapper.update() when html changed before traversing(find/contains/...);
+	* after updated, find the element again, previous found is not used anymore;
+@) jest
+	* `collectCoverageFrom` defaults to what tested;
+	* beforeAll for async;
+	* async: return promise or accept a param and call it when done;
+	* in async callback, place 'expect' in 'try', call 'done.fail(err)' in catch; since error thrown in async function can not be caught;
+	* [bug] 'verbose' clears console output;
+@) <script>
+	* async: loading side by side with parsing, pause parsing when execute; 
+	* defer: async loading and defer executing after parsing is complete (order is respected);
+
+@) travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
+
+@) new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
+
+@) postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
