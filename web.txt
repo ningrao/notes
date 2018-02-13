@@ -568,11 +568,14 @@ this.addEventListener('fetch', function(event) {
 	* call wrapper.update() when html changed before traversing(find/contains/...);
 	* after updated, find the element again, previous found is not used anymore;
 @) jest
+  * test certain files: jest file1.js file2.js. **only filename is allowed**
+  * babel-jest is applied by default if '.babelrc' is found.
 	* `collectCoverageFrom` defaults to what tested;
 	* beforeAll for async;
 	* async: return promise or accept a param and call it when done;
 	* in async callback, place 'expect' in 'try', call 'done.fail(err)' in catch; since error thrown in async function can not be caught;
 	* [bug] 'verbose' clears console output;
+  * when handles imported css modules, adopt babel plugin 'css-modules-transform' to import real modules; or with jest plugin (such as 'identity-obj-proxy') set in 'moduleNameMapper' or with 'transform' setting to mock, 
 @) <script>
 	* async: loading side by side with parsing, pause parsing when execute; 
 	* defer: async loading and defer executing after parsing is complete (order is respected);
@@ -589,3 +592,4 @@ this.addEventListener('fetch', function(event) {
   * all `describe` in all files are executed before executing `test/it`;
 @) mocha
  * instance in higher level hook is prototype of that in lower level.
+ * this.timeout() in before/beforeEach only affects itself. however affects all tests residing in a describe if placed in it.
