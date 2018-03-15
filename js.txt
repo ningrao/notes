@@ -666,6 +666,8 @@ initial-scale - visual viewport
  *) wrap doms in parens;
 
 @) react:
+ *) it's drived by `setState`.
+ *) functional component (function) is called every time in render.
  *) component created as function(no instance / 'this') or class;
  *) component and dom tag are distinguished by first letter case(Upper/lower);
  	.) when lower case is recongized as native DOM node, only supported properties is allowed;
