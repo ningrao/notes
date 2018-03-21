@@ -241,6 +241,9 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
  *) only able to check if an object exists (tag the object with this set);
  *) no way to check if is empty;
  *) automate garbage collection;
+ *) to iterate:
+   const it = keys()/entries();
+   it.next();
 
 @) Promise
  *) in executor, error thrown(implicit try/catch exists) or passed to reject is passed to 'catch';
@@ -255,6 +258,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
  	.) returned value in both handler is passed to the new promise resolve();
 	.) if a promise is returned, its result is passed;
  *) in promise chain, if a reject handler exists, the following promise is fulfilled, unless error thrown in that handler also;
+ *) its always async, even already resolved.
 
 
 @ use generator to convert async to sync syntax;
@@ -406,7 +410,7 @@ run(tasks).then(function(rs){
  	*) import field, export field;
 		export {name1 as Name1, name2} from path
 	*) import default, export as named field;
-		export name from path
+		export { default as name } from path  =>  export name from path
 	*) import default, export as default;
 		export default from path
  *) export default:

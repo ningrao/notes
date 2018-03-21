@@ -45,6 +45,12 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
 @) published package usually contains /lib (source codes) and /dist (compiled);
  *) 'npm publish' picks files listed in 'files' field of package.json;
 
+@) files: ['/dist']
+**leading slashing ensure exactness**
+
+@) main: 'dist'
+**no leading slash**
+
 @) package.json keys:
  *) id, type, _*, $*: package registries;
  *) custom: com_baidu.www
@@ -154,6 +160,9 @@ general
  *) require.resolve returns the found path;
  *) `~` can not expand, use 'process.env.HOME' instead;
 
+@) module.js
+ *) _compile(): execute the script
+
 @) secure ways:
  *) least priviledge for accounts;
  *) limit error messages;
@@ -242,6 +251,8 @@ general
 @) `node inspect` debug in cmd; 
 @) `node --inspect` debug in chrome DevTool; 
 
+@) set port: `node --inspect/debug=5858`; 
+
 @) prevent copy&paste address to debug nodejs:
 
 	chrome://inspect/#devices -> open dedicated DevTools for Node
@@ -295,13 +306,20 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 
  *) file deployed in 'svc' under '--base';
 
-@) child_process
- *) response in time (suitible for long-living as service)
-	*) spawn: stream, subshell configurable
-		*) fork: nodejs process
- *) response once after finished (suitable for application to compute result)
+@) child_process: spawn
+  *) fork: nodejs process (comand line arguments are inherited - process.execArgv, such as debug)
 	*) exec: subshell
 	*) execFile: process
+  *) interaction:
+    * pass callback to receive results once terminated
+    * register event on created process to receive messages on time.
+  *) stdio: default is pipe
+    * pipe: parent.stdio.pipe(child.stdio); the pipes (child.stdout/stdin/stderr) are also available to other streams.
+    * inherit: child.stdio === parent.stdio
+
+@) kill child process and its descendents:
+   const child = spawn('node', ['node_modules/babel-cli/bin/babel-node.js', 'test.js'], {detached:true});
+   process.kill(-child.pid);
 
 @) path.resolve
  *) returns an absolute path; 
@@ -320,3 +338,24 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 `delete require.cache[require.resolve('name')]`
 
 @) require loads file with `require('module')._load`.
+
+@) call setImmediate/nextTick to mimic event loop;
+function run(){
+  setImmediate(fun);
+}
+
+@) if process.on('SITTERM') handler exists, process will transfer the work to terminate to the handler.
+
+@) detect system:
+  process.platform === 'linux'
+@) parent process will not quit if child is running.
+
+@) call promise in async function, ensure cb is called:
+function(args, cb) {
+  returnPromise().then(function() {}, cb);
+}
+
+
+@) execute install script only when in standalone, e.g. not as dependency
+
+  "postinstall": "node -e \"JSON.parse(process.env['npm_config_argv']).remain[0] && process.exit(1)\" && installflow || echo"

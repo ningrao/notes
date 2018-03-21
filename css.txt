@@ -186,3 +186,5 @@ inline	->	id	->	attr & class	-> element & pseudo element
   * meta[viewport]:
     * width: layout viewport (device-width: screen.width)
     * scale [visual-width/device-width]: control visual viewport, e.g. content pixels displayed in window.
+
+@) requestAnimationFrame may not trigger 'trainsition';
