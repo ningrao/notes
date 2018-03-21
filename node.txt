@@ -321,6 +321,10 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
    const child = spawn('node', ['node_modules/babel-cli/bin/babel-node.js', 'test.js'], {detached:true});
    process.kill(-child.pid);
 
+ * in windows
+  - path seperator should be '\'
+  - '.cmd' can not omited.
+
 @) path.resolve
  *) returns an absolute path; 
  *) the last supplied absolute path supersedes the formers (abandoned);

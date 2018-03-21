@@ -49,6 +49,15 @@ architecture & design
  	.) dirty-check is slow;
  	.) may have cascading update, when one change triggers other changes, watchers and digest cycle may run multiple times for dirty-check;
 
+## module can not be registered after bootstraped.
+
+## define module
+
+## define providers: store in `providerCache`;
+
+## bootstrap
+  `jQuery.ready() -> angularInit -> bootstrap -> doBootstrap -> createInjector (from module in 'ng-app') -> loadModules -> runInvokeQueue (exec providers)`
+
 @) angular2(framework)
  *) mobile oriented
  *) native support(NativeScript)
@@ -177,11 +186,28 @@ tools & tech
 @) PhantomJS is a webkit browser without UI;
  *) phantom.require can only resolve phantom-buitin module and absolute path files;
  *) overcome ssl error/bugs: --ignore-ssl-errors=true
+ *) it executes in browser environment with its own modules available.
+ *) for its own module, file path is local file system style, whereas for browser's native, prefix 'file:///' is required.
 
 @) casperjs
+
+The cli calls engine with its implementation as entry. So Casper is preloaded in the engine running environment, then it loads the target js file in the running environment.
+
+ *) cli has several versions targeted different OS and languages (python, node, exe).
+
+ *) the `casper.test` and `test` passed in `casper.test.begin` callback are the same one instance of `Tester` being pre-created.
+
  *) if args exists in PhantomJS, then pass to it; or pass to itself;
  *) waitFor() is a spinning, call callback repeatedly;
  *) get output from client by message;
+ *) this.getElementAttribute return '' if no attribute;
+ *) casperjs test --verbose --log-level=debug e2e/test.js --dir=from_source
+  --dir custom arguments
+ *) when assert fails, function is aborted in this `then`.
+ *) error message shows what this assert expect.
+ *) entry point is bootstrap.js
+ *) phantom doesn't pick 'global.require' for 'require'.
+
 
 @) weex is a platform for mobile app(web can be converted to native);
 
@@ -423,6 +449,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 
 ## Compilation 
 
+  * Compilation (build in 'make' event, sources are available in this callback)
+
   * each module acquiration has a corresponding dependency plugin, which takes a proper template registered (`plugin('compilation')`) in `compilation.dependencyTemplates`;
 
   * entryModule is exported in bootstrap
@@ -475,7 +503,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 
   * add dependencies;
 
-  * each line of code can apply an event;
+  * each code of line can apply an event;
 
 ## loaders contains two types: pitch & normal. in first run, executes each pitch from low index up, until one returns module content (non-undefined), then execute normal loaders with the content from there down (not including itself). others are ignored.
  ```
@@ -745,6 +773,7 @@ this.addEventListener('fetch', function(event) {
  	.) if 'extends' from an alias
 	.）if has an arrow function method
 
+@) prettier-eslint don't work if eslint plugin is not installed globally.
 
 @) js-beautify
  *) decode unicode escape sequence: -x
@@ -792,9 +821,12 @@ this.addEventListener('fetch', function(event) {
 	* async: return promise or accept a param and call it when done;
 	* in async callback, place 'expect' in 'try', call 'done.fail(err)' in catch; since error thrown in async function can not be caught;
 	* [bug] 'verbose' clears console output;
+  * transform use babel-jest implicitly, if it's configed, 'babel-jest' should be added explicitly also.
+  * 'react-flow-props-to-prop-types' is not compatible with 'istanbul' when 'collectCoverage' is set.
 @) <script>
-	* async: loading side by side with parsing, pause parsing when execute; 
-	* defer: async loading and defer executing after parsing is complete (order is respected);
+	* async: load side by side with parsing, execute immediately after loaded while pausing parsing; 
+	* defer: load side by side with parsing, but enquequed in the order of being encounterd until parsing done to execute.
+  * script-inserted scripts execute with different behaviours across browsers. **set async to false to ensure execution order**
 
 @) travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
 
@@ -857,3 +889,26 @@ node debug node_modules/ava/profile.js some/test/file.js
 ## sinon
 calledWithExactly: calledWith + exact arguments counts
 calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
+
+## casperjs & phantomjs
+
+  * `require`: equivalent of that in 'nodejs'
+
+  * detect error in target: 
+    +
+      1. `--verbose`
+      2. 
+      ```
+      window.onerror = function(err) {
+          alert(err);
+      }
+      ```
+
+    + 
+      ```
+      casper.start().then(function() {
+        page.onerror = function (err) { this.echo(err); }
+      })
+      ```
+
+
