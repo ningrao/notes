@@ -190,6 +190,13 @@ tools & tech
  *) for its own module, file path is local file system style, whereas for browser's native, prefix 'file:///' is required.
 
 @) casperjs
+
+The cli calls engine with its implementation as entry. So Casper is preloaded in the engine running environment, then it loads the target js file in the running environment.
+
+ *) cli has several versions targeted different OS and languages (python, node, exe).
+
+ *) the `casper.test` and `test` passed in `casper.test.begin` callback are the same one instance of `Tester` being pre-created.
+
  *) if args exists in PhantomJS, then pass to it; or pass to itself;
  *) waitFor() is a spinning, call callback repeatedly;
  *) get output from client by message;
@@ -198,6 +205,8 @@ tools & tech
   --dir custom arguments
  *) when assert fails, function is aborted in this `then`.
  *) error message shows what this assert expect.
+ *) entry point is bootstrap.js
+ *) phantom doesn't pick 'global.require' for 'require'.
 
 
 @) weex is a platform for mobile app(web can be converted to native);
