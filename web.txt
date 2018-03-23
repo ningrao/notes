@@ -184,10 +184,17 @@ tools & tech
 @) Esprima is a parser/metaprogramming tool for javascript;
 
 @) PhantomJS is a webkit browser without UI;
- *) phantom.require can only resolve phantom-buitin module and absolute path files;
+ *) phantom.require can resolve phantom-buitin module, node modules, and absolute path files;
  *) overcome ssl error/bugs: --ignore-ssl-errors=true
  *) it executes in browser environment with its own modules available.
  *) for its own module, file path is local file system style, whereas for browser's native, prefix 'file:///' is required.
+ *) initial scripts and injected (`injectJs`)
+    * `global.require` shadows `require`;
+    * `this` and `global` both are `window`
+ *) in required script
+    * `global.require` can not shadow `require`;
+    * `this` is an empty object, `global` is window.
+ *) caches file even from local system (add query to overcome).
 
 @) casperjs
 
@@ -886,6 +893,10 @@ npmjs: roney
 node debug node_modules/ava/profile.js some/test/file.js
 ?? lib/fork.js:40
 
+* with nyc, nyc needs instrument.
+
+## nyc: args for itself should be placed before tester.
+
 ## sinon
 calledWithExactly: calledWith + exact arguments counts
 calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
@@ -912,3 +923,6 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
       ```
 
 
+@) test throwing error:
+ * chai.expect(function() { fun(arg); }).throw(err);
+ * sinon.assert.threw checks after called, does'nt invoke and catch by itself.

@@ -104,6 +104,12 @@ npm info [-g] pkg
 @) load 'jsx' in nodejs: node-jsx
 
 @) npm-run-all/npm-s/npm-p: sequential by default;
+
+@) test if installed standalone
+```
+  "postinstall": "node -e \"JSON.parse(process.env['npm_config_argv']).remain[0] && process.exit(1)\" && npm run install-flow || echo",
+```
+
 ---------------------------------------
 express
 ---------------------------------------
@@ -159,6 +165,7 @@ general
  *) '.js' extension is omited only in relative path;
  *) require.resolve returns the found path;
  *) `~` can not expand, use 'process.env.HOME' instead;
+ *) it's not stored in `global`.
 
 @) module.js
  *) _compile(): execute the script

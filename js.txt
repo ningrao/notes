@@ -862,3 +862,5 @@ xhr.onload=function(){
 	}
 }
 xhr.send();
+
+@) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
