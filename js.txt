@@ -486,7 +486,7 @@ GENERAL
  *) Array.isArray
  *) forEach/map/filter can't break;
  *) find/every/some terminates when result got;
- *) reduce/reduceRight accept an initial value;
+ *) reduce/reduceRight accept an initial accumulated value passed in the first argument, if not, its the first element;
  *) copyWithin will not extend the array;
  *) of(el,el...);	from(array);
  *) reduce((accumulated, part, i)=>{} [,initialValue]);
@@ -726,6 +726,8 @@ initial-scale - visual viewport
  	.) component hierachy;
 	.) container component
  *) react-router:
+  .) hashRouter will not match publicPath
+  .) router listen to history, then update `match`
  	.) when component doesn't update when url changes, pass location as prop to it(which will change to cause re-render); 
 		..) applied to the descendents of component which is rendered by Route, which itself already has prop of location injected;
 		..) when component is not in Route, wrap in withRouter to access the location;
@@ -735,18 +737,160 @@ initial-scale - visual viewport
     * what ever child with props of 'path' or 'from';
 	.) react-router-dom for browser; react-router-native for server; react-router-server for server; react-router is fundametal; 
   .) Redirect should not be rendered if not matched, or it will update and cause error 'You tried to redirect to the same route you're currently on', so always place it in Switch.
+  .) if path is empty, a slash is passed.
  *) context:
  	.) childContextTypes and contextTypes are necessary;
-	.) can be relayed;
+ 	.) provider: childContextTypes & getChildrenContext
+  .) consumer (any descendants): contextTypes (if none, context is empty)
+	?) can be relayed;
  *) HOC(higher-order-comp)/composition: wrap a component in another, usually renders the same one with special props;
  *) ReactDOM.render() will check if rendered HTML exists already, and match them if so;
  *) custom DOM attribute added in 'data-*' is reserved;
  *) 'key' attr is reserved, always 'undefined';
  *) change root element's property: call again ReactDOM.render;
  *) <Com /> returns ReactElement(whose $$typeof is a Symbol of key 'react.element') by React.createElement(), which is a virtual DOM describing React Component(type==function)/DOM element(type==string);
- *) render DOM elements in 'react-dom/lib/ReactDOMComponent.js', mountComponent();
  *) setState cause rerender even values are not changed.
+ *) devServer publicPath has to ends with slash
+ *) cloneElement to assign extra props or replace children.
 
+### Flowing
+
+#### Init
+
+ DOMRenderer (ReactFiberReconciler$1) --> ReactFiberScheduler (ReactFiberBeginWork/CompleteWork/CommitWork)--> ReactFiberClassComponent
+
+#### Render
+
+ react-dom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates -> DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork (scheduleWorkImpl) -> requestWork(fiberRoot) -> performWork (set nextFlushedRoot) -> performWorkOnRoot 
+ -> renderRoot (create nextUnitOfWork - fiber.alternate) -> workLoop (by invokeGuardedCallback$1) -> performUnitOfWork(fiber) (looping through nextUnitOfWork) -> beginWork  -- (no children) completeUnitOfWork ( completeWork ) -> return child/sibling fiber to next workLoop.
+
+ -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
+
+##### performUnitOfWork
+
+ -> beginWork
+
+ no returned ? -> completeUnitOfWork
+
+
+##### beginWork
+
+ - updateHostRoot -> reconcileChildren 
+
+ - updateClassComponent 
+    
+  current?
+  
+    -> null (mount) : constructClassInstance, mountClassInstance -> componentWillMount
+  |
+    -> object (update) : updateClassInstance -> should..
+
+  -> finishClassComponent -> render -> reconcileChildren
+
+
+##### reconcileChildren (reconcileChildrenAtExpirationTime) - attatch child fiber
+
+  current?
+
+    -> null : mountChildFibers (reconcileChildFibers (shouldTrackSideEffects: false))
+   |
+    -> object: reconcileChildFibers reconcileChildFibers (shouldTrackSideEffects: true)
+
+  <- workInProgress.child
+
+
+##### reconcileChildFibers 
+ - react.element
+
+    -> reconcileSingleElement  -> createFiberFromElement
+
+    -> placeSingleChild 
+
+##### completeUnitOfWork - looping to unwind up until sibling exists, then passing back to workLoop. When the last sibling finished, it continues unwinding to parent. The process runs until root reached.
+
+##### completeWork
+
+  - HostComponent
+
+    -> createInstance -> document.createElement
+
+    -> appendAllChildren
+
+    -> finalizeInitialChildren: autoFocus? -> setInitialProperties$1 -> setInitialDOMProperties -> setValueForProperty
+
+    <- null | CallComponent
+
+
+#### Update
+
+ ->  setState
+
+ ->  updater().enqueueSetState: store partialState in fiber.updateQueue; scheduleWork  
+
+ -> beginWork
+
+ -> updateClassInstance: shouldUpdate? -> getMaskedContext -> componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate -> flag componentDidUpdate
+
+  -> finishClassComponent -> render -> reconcileChildren
+
+### event flow
+
+ setInitialDOMProperties (onClick) -> ensureListeningTo (listenTo) -> trapBubbledEvent : bind `dispatchEvent` to root.
+
+
+ click:
+
+ dispatchEvent -> batchedUpdates (handleTopLevelImpl) | performWork
+
+### tips
+
+- pull update instead of push update
+
+- _reactRootContainer: a special plain object, fiber root in rendered DOM.
+
+- NESTED_UPDATE_LIMIT = 1000: maximum updates to prevent infinite call `setState` in componentWillUpdate or componentDidUpdate.
+
+- fiber.alternate is a copy, they point to each other, on which current update is working on.
+
+- a fiber corresponds to a component, representing a stack frame of function, which is a unit of work.
+
+- fiber.stateNode is instance of Component
+
+- Component instance
+
+  - updater: set in ReactFiberClassComponent.adoptClassInstance.
+
+  - _reactInternalFiber
+
+- HostComponent: native DOM
+
+- adopt postMessage to invoke requestAnimationFrame to ensure it runs after next repaint (before by default).
+
+- max frame rates is 120hz 
+
+- adopt requestIdleCallback to invoke async performWork.
+
+- all contexts of ascesters are cumulated.
+
+@) requestAnimationFrame
+
+- runs in the same rate with display device refresh rate
+
+- will pause when invisible
+
+- argument callback receiving is timestamp when this repaint starts. The same value passed to all callbacks.
+
+@) requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
+
+@) performance.now() returns DOMHighResTimeStamp (monotonically increasing and sub-milisecond), which is duration from `time origin`
+
+@) time origin:
+ 
+- browser context is created
+
+- previous page leaving confirming dialog is confirmed.
+
+- webworker is created.
 
 @) redux:
 https://tonyhb.gitbooks.io/redux-without-profanity
@@ -758,6 +902,11 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  *) container is wrapper component which passes state field as property to component;
  *) action is a data structure passed to reducer to initiate an action to store;
  *) middleware intercepts action when passed to reducer;
+ *) enhancer is to enhance `createStore`, which accepts `createStore` and whatever arguments createStore accepts. Then how to create store is totally delievered to the enhancer.
+ *) middleware is nested functions
+    1. receive store
+    2. receive next middleware (the last middleware receives dispatch: compose(middlewares)(store.dispatch))
+    3. reducer handler
  *) reducer:
  	.) contain biz logic;
 	.) normalize/flatten the shape(reference structure by id), even nested is applicable(combineReducers({fieldA:combineReducers({fieldA_A, fieldA_B})}));
@@ -795,6 +944,24 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  *) reselect
  	.) reuse between different instances of container can memoize, if 'props' is passed, since 'props' are different;
 	.) if some arguments always are new even data is not modified, replace equalityCheck(defaultMemoize) with deep compare, **if efficient** 
+
+
+  *) compose(fun1, fun2, ...): args to the last, then result to the left, left, ...
+
+  return funcs.reduce(function (a, b) {
+    return function () {
+      return a(b.apply(undefined, arguments));
+    };
+  });
+
+-----------
+    (function () {
+      return (function () {
+        return a(b.apply(undefined, arguments));
+      })(c.apply(undefined, arguments));
+    })(d.apply(undefined, arguments));
+-----------
+
 @) fetch(https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch);
  *) cors: dictate browser whether to send, header from serer is still checked;
  *) no-cors(default): header is not required, but methods and response properties are restricted, and error message is opaque if server rejected;

@@ -115,6 +115,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) align: justify-content/align-items
  *) flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
  *) flex-flow: direction + wrap.
+ *) by default grow/shrink respect their ratio of flex-basis.
 
 
 @) grid

@@ -291,6 +291,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 
 # webpack
 
+`node debug node_modules/webpack/bin/webpack.js`
+
  *) WebpackOptionsDefaulter.js apply default options. 
  *) all processings are subscribed as event handlers/plugins. (default actions are set in 'WebpackOptionsApply.js')
  *) v2 support es6 module natively;
@@ -926,3 +928,28 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
 @) test throwing error:
  * chai.expect(function() { fun(arg); }).throw(err);
  * sinon.assert.threw checks after called, does'nt invoke and catch by itself.
+
+@) websocket is and independent protocol based on TCP. however it's handshake is http upgrade request. uri scheme is 'ws/wss'
+
+    0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+
+@) af-webpack
+DISABLE_CLEAR_CONSOLE
+
