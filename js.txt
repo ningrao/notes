@@ -761,16 +761,45 @@ initial-scale - visual viewport
 
 #### Render
 
- react-dom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates -> DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork (scheduleWorkImpl) -> requestWork(fiberRoot) -> performWork (set nextFlushedRoot) -> performWorkOnRoot 
- -> renderRoot (create nextUnitOfWork - fiber.alternate) -> workLoop (by invokeGuardedCallback$1) -> performUnitOfWork(fiber) (looping through nextUnitOfWork) -> beginWork  -- (no children) completeUnitOfWork ( completeWork ) -> return child/sibling fiber to next workLoop.
+ react-dom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates/DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork/scheduleWorkImpl(find root) -> requestWork(fiberRoot) -> performWork
 
- -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
+#### performWork
+  -> findHighestPriorityRoot                                                <---
+    (find a root with `remainingExpirationTime` set to other than `NoWork`)      |
+                                                                                 |
+                                                                                 | (looping)
+  | [nextFlushedRoot]                                                            |
+  |-> performWorkOnRoot                                                      ----
+
+#### performWorkOnRoot 
+  -> renderRoot
+      
+      -> createWorkInProgress (nextUnitOfWork = current.alternate)
+           
+      -> workLoop (by invokeGuardedCallback$1) <----------------------------------------------
+          -> performUnitOfWork(workInProgress.alternate) (looping through nextUnitOfWork)         |
+          -> beginWork                                                                            | (child/sibling fiber)
+          | [no children]                                                                         |
+          |-> completeUnitOfWork -> completeWork                                               ----
+      
+     \/ current.alternate
+      
+  -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
+                           -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent)
+                                                                     -> commitCallbacks (ClassComponent, HostRoot)
+                                                                     -> commitMount (HostComponent)
+                                                 -> commitAttachRef
+                                                 -> commitErrorHandling -> componentDidCatch (catch errors of descendents only)
+     \/ alternate.expirationTime
+      
+  -> root.remainingExpirationTime = <return>
+
 
 ##### performUnitOfWork
 
  -> beginWork
-
- no returned ? -> completeUnitOfWork
+ | (no return value)
+ -> completeUnitOfWork
 
 
 ##### beginWork
@@ -779,14 +808,15 @@ initial-scale - visual viewport
 
  - updateClassComponent 
     
-  current?
+  current (alternate)?
   
     -> null (mount) : constructClassInstance, mountClassInstance -> componentWillMount
   |
-    -> object (update) : updateClassInstance -> should..
+    -> object (update) : -> updateClassInstance: shouldUpdate? -> getMaskedContext -> componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate -> flag componentDidUpdate
 
   -> finishClassComponent -> render -> reconcileChildren
 
+##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
 ##### reconcileChildren (reconcileChildrenAtExpirationTime) - attatch child fiber
 
@@ -825,14 +855,12 @@ initial-scale - visual viewport
 
  ->  setState
 
- ->  updater().enqueueSetState: store partialState in fiber.updateQueue; scheduleWork  
+ ->  updater().enqueueSetState (store partialState in fiber.updateQueue) -> scheduleWork -> requestWork -> performWork
 
- -> beginWork
-
- -> updateClassInstance: shouldUpdate? -> getMaskedContext -> componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate -> flag componentDidUpdate
-
-  -> finishClassComponent -> render -> reconcileChildren
-
+##### root.current.alternate.expirationTime
+  enqueueSetState (update.expirationTime = computeExpirationForFiber(fiber))
+    |
+  
 ### event flow
 
  setInitialDOMProperties (onClick) -> ensureListeningTo (listenTo) -> trapBubbledEvent : bind `dispatchEvent` to root.
@@ -846,11 +874,25 @@ initial-scale - visual viewport
 
 - pull update instead of push update
 
-- _reactRootContainer: a special plain object, fiber root in rendered DOM.
+- DOM._reactRootContainer (fiber.stateNode): a special plain object, a virtual instance of Component, set on rendered root DOM container.
+```
+  var root = {
+    current: uninitializedFiber (HostRoot),
+    containerInfo: containerInfo,
+    pendingChildren: null,
+    remainingExpirationTime: NoWork,
+    isReadyForCommit: false,
+    finishedWork: null,
+    context: null,
+    pendingContext: null,
+    hydrate: hydrate,
+    nextScheduledRoot: null
+  };
+```
 
 - NESTED_UPDATE_LIMIT = 1000: maximum updates to prevent infinite call `setState` in componentWillUpdate or componentDidUpdate.
 
-- fiber.alternate is a copy, they point to each other, on which current update is working on.
+- fiber.alternate is a copy (they point to each other), on which current update is working on (argument named `current`).
 
 - a fiber corresponds to a component, representing a stack frame of function, which is a unit of work.
 
@@ -1031,3 +1073,39 @@ xhr.onload=function(){
 xhr.send();
 
 @) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
+import React from 'react';
+import { render } from 'react-dom';
+
+class Comp extends React.Component {
+  running = false;
+  start = () => {
+    this.running = true;
+    this.setState({ counter: 0 });
+  }
+  stop = () => this.running = false;
+
+  state = { counter: 0 };
+  componentWillUpdate() {
+    if (this.running) {
+      this.setState({ counter: this.state.counter + 1 });
+    }
+  }
+  render() {
+    return (
+      <div>
+        <div>{this.state.counter}</div>
+        <div>
+          <button onClick={this.start}>start</button>
+          <button onClick={this.stop}>stop</button>
+        </div>
+      </div>
+    )
+  }
+}
+
+render(
+  <div>
+    <Comp />
+  </div>
+  , document.getElementById('root'),
+);
