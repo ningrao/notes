@@ -194,10 +194,17 @@ tools & tech
 @) Esprima is a parser/metaprogramming tool for javascript;
 
 @) PhantomJS is a webkit browser without UI;
- *) phantom.require can only resolve phantom-buitin module and absolute path files;
+ *) phantom.require can resolve phantom-buitin module, node modules, and absolute path files;
  *) overcome ssl error/bugs: --ignore-ssl-errors=true
  *) it executes in browser environment with its own modules available.
  *) for its own module, file path is local file system style, whereas for browser's native, prefix 'file:///' is required.
+ *) initial scripts and injected (`injectJs`)
+    * `global.require` shadows `require`;
+    * `this` and `global` both are `window`
+ *) in required script
+    * `global.require` can not shadow `require`;
+    * `this` is an empty object, `global` is window.
+ *) caches file even from local system (add query to overcome).
 
 @) casperjs
 
@@ -292,7 +299,11 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 
 @) tapable stores plugins in `_plugins`
 
-@) webpack
+# webpack
+
+`node debug node_modules/webpack/bin/webpack.js`
+
+ *) WebpackOptionsDefaulter.js apply default options. 
  *) all processings are subscribed as event handlers/plugins. (default actions are set in 'WebpackOptionsApply.js')
  *) v2 support es6 module natively;
  *) target environment:	target: 'node'/'web'(default)/...
@@ -377,44 +388,214 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 	},
  }
  *) output.library & libraryTarget
- *) loaders:
- *) plugins:
+ * `webpack --json > file.json` emits stats content
+ 
+## plugins:
+
  	* an object, with a method named 'apply' being called with `compiler`;
+
   * Function is a builtin Object of this type.
 
+  * can be registered in an event by `Tapable.plugin(event, Plugin)` or executed by `Tapable.apply(Plugin)`.
 
- * 'WebpackOptionsApply.js' initialization
- * Compiler
+## outputed bundle format (self-executing bootstrap function with module list):
+
+    `(function bootstrap(modules){})([module, module, ...]);`
+
+## 'WebpackOptionsApply.js' initialization
+
+## Compiler
+
   * resolvers: instances of `enhanced-resolver`
+
   * compile(): runner
 
- * Compilation (build in 'make' event, sources are available in this callback)
-    addEntry (SingleEntryDependency/MultiEntryDependency) -> _addModuleChain/addModuleDependencies() -> buildModule() -> NormalModule.build()
-  * dependencyFactories: handlers for dependencies(resolve path and loaders (loaders in path along with rules));
-   * NormalModuleFactory.js
-   * ContextModuleFactory.js
-  * _addModuleChain: load module and dependencies.
- * NormalModule.js: Module object, method 'build' executes loaders, then parse ast.
-  * _source: file name and content;
-  * derive from Module <- DependenciesBlock
- * parser.js parse ast;
-  * this.state.current is the module;
-  * add variables;
-  * add dependencies;
-  * each code of line can apply an event;
- * loaders contains two types: pitch & normal. in first run, executes each pitch from low index up, until one returns non-undefined, then read the file and execute normal loaders from there down (not including itself). others are ignored.
- loader         loader         loader         
- pitch  ->      pitch      ->   pitch 
-                  ↓ (return non-undefined)            
-               (load file)
- normal <-      normal   <-    normal
- * loader is executed on 'loaderContext', which is created in NormalModule.createLoaderContext();
+  * emitAssets()
 
- * styleloader.pitch returns rest loaders chain in require as a module. later they are be parsed as dependencies;
+  * input filesystem are difined in enhanced-resolve, with wrapping of reading methods of node fs.
+
+  * output filesystem are difined by webpack in the same way, with only writing APIs from input fs;
+
+```
+  build modules  ->  add chunks  -> (optimize-tree) ->  create assests;
+```
+
+## enhanced-resolver
+
+  `resolve (check cache) -> new-resolve -> parsed-resolve`
+
+  * passed resolved path with query as 'resource' to module via compilation.
+
+  * 'fs.stat' to check existence.
+
+  * `ModulesInHierachicDirectoriesPlugin` for modules in 'node_modules';
+
+  * if no error and no result, resolve again, in 'onResolve'
+
+  * `JoinRequestPlugin` append `request` to `path` and clear it.
+  ```
+{
+  path: directory
+  request: file name
+}
+  ```
+  * `FileExistsPlugin` is the last resort to check specific file.
+
+  * `Resolver.parse` determine kinds
+  ```
+{
+  module: 'abc' --> no './'
+  directory: '....abc/'  --> ends with [back]slash
+  file: not used, true if other two are false
+}
+  ```
+
+  * async.parallel returns an array of all results
+
+  *
+	resolver.plugin(this.source, function(request, callback) {
+		if(request.directory) return callback(); --> give up processing, pass to other plugin being subscribed to this event.
+		var obj = Object.assign({}, request);
+		delete obj.directory;
+		resolver.doResolve(target, obj, null, callback); --> next step/event (target) registered when apply this plugin (ResolverFactory)
+	});
+
+  * ModuleKindPlugin/FileKindPlugin make sure its module/file to process next stop.
+
+  * NextPlugin relay to next step.
+
+
+
+## Compilation 
+
+  * Compilation (build in 'make' event, sources are available in this callback)
+
+  * each module acquiration has a corresponding dependency plugin, which takes a proper template registered (`plugin('compilation')`) in `compilation.dependencyTemplates`;
+
+  * entryModule is exported in bootstrap
+
+  * a chunk is corresonding to a output bundle.
+  
+  * the first chunk of the first entrypoint has bootstrap codes.
+
+  * if a chunk has entrypoints, it's initial, which is the 'entry' option in webpack config file.
+
+  * addChunk() to add new chunk.
+ ??? loader returns array of [[id, source]] ?
+ 
+  * build in 'make' event, sources are available in this callback
+
+  * chunks(processDependenciesBlocksForChunk) and assets are created in 'seal'.
+
+  * mainTemplate: asset template with bootstrap logics.
+
+  * chunkTemplate: asset template without bootstrap logics.
+
+    > `addEntry (SingleEntryDependency/MultiEntryDependency) -> _addModuleChain/addModuleDependencies() -> buildModule() -> NormalModule.build()`
+
+  * dependencyFactories: handlers for dependencies(resolve path and loaders (loaders in path along with rules));
+    + add by 'entry' alike plugins.
+    + map of Dependency constructor to the next two Factory instance.
+    + NormalModuleFactory.js
+    + ContextModuleFactory.js
+    + the two instances are created for each compilation in newCompilationParams
+
+  * _addModuleChain: load module and dependencies.
+  
+  * createModuleAssets: copy modules assets to compilation.
+
+  * createChunkAssets: create assets from template.
+
+    > modules are rendered in Template.renderChunkModules();
+
+## NormalModule.js: Module object, method 'build' executes loaders, then parse ast.
+
+  * _source: file name and content;
+
+  * derive from Module <- DependenciesBlock
+
+## parser.js parse **javascript** ast; (if file is not javascript, adopt loader to convert to commonjs module with content as string)
+
+  * this.state.current is the module;
+
+  * add variables;
+
+  * add dependencies;
+
+  * each code of line can apply an event;
+
+## loaders contains two types: pitch & normal. in first run, executes each pitch from low index up, until one returns module content (non-undefined), then execute normal loaders with the content from there down (not including itself). others are ignored.
+ ```
+loader         loader         loader         
+pitch  ->      pitch      ->   pitch 
+                ↓ (return non-undefined)            
+             (load file)
+normal <-      normal   <-    normal
+ ```
+
+  * the request which loader receives is the path with its own truncated (what is left is other loaders and file path).
+
+  * loader is executed on 'loaderContext', which is created in NormalModule.createLoaderContext();
+
+    + readResource: reading file method.
+
+    + exec: execute read module text via module._compile();
+
+  * content is got from pitch, if no loader or no pitch loader or pitch loader return nothing,  `readResource` is called.
+    
+    + both string and Buffer(raw) are allowed.
+    
+    + if loader receives Buffer, export field 'raw' as undefined.
+
+### context loader: for require('aff'+abc);
+
+## LoaderRunner.js
+
+  * processResource: call `readResource` to read target content
+
+  * loadLoader: read loader content
+
+### prefixes: don't apply loaders in options
+
+  * `!!` - normal loaders 
+  * `!` - pre loaders 
+  * `-!` - post loaders 
+
+## 'normal-module-loader' is triggered before build in 'NormalModule'.
+
+## styleloader.pitch returns rest loaders chain in require as a module. later they are be parsed as dependencies;
   `require('cssloader....')`
 
- * extract-text-webpack-plugin trigger rebuild in 'optimize-tree';
+## extract-text-webpack-plugin
+
+  1. 'fallback' loaders are invoked at first to compile into module;
+
+  2. after compilation, in 'optimize-tree' rebuild is invoked;
+
+  3. when rebuild, in pitch loader of child compiler. 
+
+    * in 'normal-module-loader', loaderContext[NS] is flagged. which is a function. turned off in the same event in child compiler.
+
+      + check 'allChunk' and module[`NS/extract`].
+
+      + store extracted content built from child-compiler.
+
+    * in loader pitch: module[`NS`] (contains extracted content) is set to indicate that this module needs to be extracted.
+
+    * in 'optimize-tree: 
+
+      + module[`NS`] is checked if this module needs to be extracted.
+
+      + if true,  additionally to check if its containing chunk is initial/entry or orphan or options.allChunk (including descending chunks) is set; then set module[`NS/extract`]
+
+    * if true and not extracted, rebuild is invoked (_source is cleared in module.rebuild()).
+
+    * in loader pitch, it checks module[`NS`] for whether to invoke a child compiler to build with the loaders after 'callback' and then file is executed and result is moved in module[NS]. (loaderIndex is also moved to the last callbacks; if options.remove is set, data is returned, then normal loaders will be executed from there down, or pitch goes up)
+
+    * in rebuildModule callback, "additional-assets" handler is registered to retrieve result in module[NS] into assets. 
                   
+
+
 @) postcss
 
 
@@ -651,7 +832,9 @@ this.addEventListener('fetch', function(event) {
 	* matchesElement: subcollection of props match;
 	* call wrapper.update() when html changed before traversing(find/contains/...);
 	* after updated, find the element again, previous found is not used anymore;
+  * mount().prop() gets props of component, shallow().prop() get from root dom.
 @) jest
+  * it caches outputs files automatically;
 	* `collectCoverageFrom` defaults to what tested;
 	* beforeAll for async;
 	* async: return promise or accept a param and call it when done;
@@ -669,6 +852,66 @@ this.addEventListener('fetch', function(event) {
 @) new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
 
 @) postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
+
+@) prettier-eslint --write "**/*.js"
+ * "" is required
+ * option error may occur in plugin, ignore them.
+
+## flow
+  * Node/Element exists in core, in React as well. 
+  * object.keys can infer types correctly, but values/entries not until v0.66.
+  * `any` bypasses type checking; use `mixed` instead.
+  * asterisk (`*`) tells Flow to infer a type parameter, rather than making you write it out explicitly.
+  * adopt intersection `&` to extend.
+    **{ a: number } & { a: string }** results unusable type `a: number & string`
+    `|` should be used instead.
+
+  * opaque type:
+    * can not be modified, e.g. manipulate its members.
+    * can not be infered to its underlying type
+    * equal in defining file (inner structure is accessable), nominal in outside
+  * width subtyping
+    * {a, b} is subtype of {a};
+    * is allowed by default, set 'exact' to prevent: {|a: string|} 
+  * depth subtype 
+    * no more members are added, by added to some of its members (width subtype of properties).
+    * is not allowed caused by object mutability. 
+    * prevent write (+), then subtype is acceptable (no base type will be set to cause the object with subtype property reading error).
+    * prevent read (-), then base type is acceptable (no non-existing properties will be read)
+    * when a property is not invariant, its self also behaves the same. (change whole object).
+
+  * nominal comparison takes only name into account, whereas structural compares their inner structure. 
+    * class is nominal ( convert to interface to apply structural)
+    * object is structural
+  * class its own is a type (no need to create manually)
+  * interface covariant(+) accept subtypes, contravariant(-) accept base types.
+  * create type of a variable instead of creating manually, adopt 'typeof' 
+  * `import * as React from react` retrieves 'PropTypes', which triggers warning in React 15.
+  * when type is imported from a file ignored/(without @flow), it's not checked.
+  * ignore path is regexp pattern matching against absolute path (<PROJECT_ROOT> is symbol for root dir)
+  * ingored files will be unresolvable.
+  * check-contents always resolve bases on root dir.
+
+npmjs: roney
+
+
+## mocha 
+
+* debug: `mocha debug ...`
+
+## ava
+
+* debug
+node debug node_modules/ava/profile.js some/test/file.js
+?? lib/fork.js:40
+
+* with nyc, nyc needs instrument.
+
+## nyc: args for itself should be placed before tester.
+
+## sinon
+calledWithExactly: calledWith + exact arguments counts
+calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
 
 ## casperjs & phantomjs
 
@@ -702,3 +945,30 @@ this.addEventListener('fetch', function(event) {
 
 - module.enable: store factory, load deps
 
+@) test throwing error:
+ * chai.expect(function() { fun(arg); }).throw(err);
+ * sinon.assert.threw checks after called, does'nt invoke and catch by itself.
+
+@) websocket is and independent protocol based on TCP. however it's handshake is http upgrade request. uri scheme is 'ws/wss'
+
+    0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+
+@) af-webpack
+DISABLE_CLEAR_CONSOLE
