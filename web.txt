@@ -58,6 +58,16 @@ architecture & design
 ## bootstrap
   `jQuery.ready() -> angularInit -> bootstrap -> doBootstrap -> createInjector (from module in 'ng-app') -> loadModules -> runInvokeQueue (exec providers)`
 
+## loadModules loads dependency modules first, which are stored in 'requires' field.
+
+## modules has its own invokeQueue, which stores provider()/factory()/service()/... callback, which are called in `loadModules`
+
+## providers are stored in providerCache
+
+## provider.$get() returns an instance, stored in instanceCache. All services of all modules are stored in a single cache, so duplicate names will override others.
+
+## injector.invoke() parse arguments (injectionArgs) and retrieve them (getService) from cache and pass to invoked functin.
+
 @) angular2(framework)
  *) mobile oriented
  *) native support(NativeScript)
@@ -681,4 +691,14 @@ this.addEventListener('fetch', function(event) {
       })
       ```
 
+
+## requirejs
+
+- modules are loaded in a context (a global object), different contexts can be applied to load different versions of the same module.
+
+- when call `require`, a dummy module is created, of which the required module array ('string' is invalid) is dependency.
+
+- module.init: flag module loaded.
+
+- module.enable: store factory, load deps
 
