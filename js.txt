@@ -757,11 +757,15 @@ initial-scale - visual viewport
 
 #### Init
 
- DOMRenderer (ReactFiberReconciler$1) --> ReactFiberScheduler (ReactFiberBeginWork/CompleteWork/CommitWork)--> ReactFiberClassComponent
+ DOMRenderer (ReactFiberReconciler$1) => ReactFiberScheduler (ReactFiberBeginWork/CompleteWork/CommitWork) => ReactFiberClassComponent
 
 #### Render
 
- react-dom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates/DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork/scheduleWorkImpl(find root) -> requestWork(fiberRoot) -> performWork
+ ReactDom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates/DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork/scheduleWorkImpl -> requestWork(fiberRoot) -> performWork
+
+#### scheduleWork/scheduleWorkImpl
+ - find root
+ - assign expirationTime to every node in the pass
 
 #### performWork
   -> findHighestPriorityRoot                                                <---
@@ -771,20 +775,23 @@ initial-scale - visual viewport
   | [nextFlushedRoot]                                                            |
   |-> performWorkOnRoot                                                      ----
 
-#### performWorkOnRoot 
+#### performWorkOnRoot (wrapped in `isRendering` lock) 
   -> renderRoot
       
-      -> createWorkInProgress (nextUnitOfWork = current.alternate)
+      -> createWorkInProgress (nextUnitOfWork = root.current.alternate)
            
-      -> workLoop (by invokeGuardedCallback$1) <----------------------------------------------
-          -> performUnitOfWork(workInProgress.alternate) (looping through nextUnitOfWork)         |
-          -> beginWork                                                                            | (child/sibling fiber)
-          | [no children]                                                                         |
-          |-> completeUnitOfWork -> completeWork                                               ----
-      
-     \/ current.alternate
+      -> workLoop (by invokeGuardedCallback$1) <----------------------------------------
+          -> performUnitOfWork(nextUnitOfWork) (looping through nextUnitOfWork)         |
+            -> beginWork                                                                | 
+            | \/ [next = child/sibling fiber]                                           |                   
+            | [no next]                                                                 |
+            |-> completeUnitOfWork -> completeWork                                      |
+            <- [next]                                                                ---
+          <- [next]
+     \/ root.current.alternate
       
   -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
+                           -> root.current = alternate
                            -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent)
                                                                      -> commitCallbacks (ClassComponent, HostRoot)
                                                                      -> commitMount (HostComponent)
@@ -804,17 +811,31 @@ initial-scale - visual viewport
 
 ##### beginWork
 
- - updateHostRoot -> reconcileChildren 
-
- - updateClassComponent 
+ -> updateHostRoot => reconcileChildren 
+|
+ -> updateClassComponent 
     
   current (alternate)?
   
-    -> null (mount) : constructClassInstance, mountClassInstance -> componentWillMount
+    -> null (mount) : constructClassInstance -> mountClassInstance -> processUpdateQueue 
   |
-    -> object (update) : -> updateClassInstance: shouldUpdate? -> getMaskedContext -> componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate -> flag componentDidUpdate
+    -> object (update) : -> updateClassInstance
 
   -> finishClassComponent -> render -> reconcileChildren
+
+##### mountClassInstance 
+  -> instance.context = getMaskedContext();
+  -> componentWillMount
+
+##### updateClassInstance: shouldUpdate? 
+  -> getMaskedContext 
+  -> componentWillReceiveProps 
+  -> processUpdateQueue
+  -> shouldComponentUpdate 
+  | [true]
+  |-> componentWillUpdate 
+  -> flag componentDidUpdate
+  -> store props & state
 
 ##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
@@ -824,7 +845,7 @@ initial-scale - visual viewport
 
     -> null : mountChildFibers (reconcileChildFibers (shouldTrackSideEffects: false))
    |
-    -> object: reconcileChildFibers reconcileChildFibers (shouldTrackSideEffects: true)
+    -> object: reconcileChildFibers (shouldTrackSideEffects: true)
 
   <- workInProgress.child
 
@@ -859,7 +880,8 @@ initial-scale - visual viewport
 
 ##### root.current.alternate.expirationTime
   enqueueSetState (update.expirationTime = computeExpirationForFiber(fiber))
-    |
+    | expirationTime
+  scheduleWork/scheduleWorkImpl (update host's expirationTime - then findHighestPriorityRoot will find it again)
   
 ### event flow
 
@@ -870,7 +892,11 @@ initial-scale - visual viewport
 
  dispatchEvent -> batchedUpdates (handleTopLevelImpl) | performWork
 
-### tips
+### Tips
+
+- React defines abstract API leaving for other renderer to implement, such as Component.updater.
+
+- batchedUpdates: if in batched updating & rendering process, `performWork` will not be invoked.
 
 - pull update instead of push update
 
@@ -895,8 +921,9 @@ initial-scale - visual viewport
 - fiber.alternate is a copy (they point to each other), on which current update is working on (argument named `current`).
 
 - a fiber corresponds to a component, representing a stack frame of function, which is a unit of work.
+  There are a stack system internally, consisting of valueStack & fiberStack. Anything can be pushed into & poped out of the valueStack, with corresponding fiber into fiberStack.
 
-- fiber.stateNode is instance of Component
+- fiber.stateNode is instance of Component/DOM
 
 - Component instance
 
@@ -912,7 +939,7 @@ initial-scale - visual viewport
 
 - adopt requestIdleCallback to invoke async performWork.
 
-- all contexts of ascesters are cumulated.
+- all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of each instance.
 
 @) requestAnimationFrame
 
@@ -1073,39 +1100,3 @@ xhr.onload=function(){
 xhr.send();
 
 @) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
-import React from 'react';
-import { render } from 'react-dom';
-
-class Comp extends React.Component {
-  running = false;
-  start = () => {
-    this.running = true;
-    this.setState({ counter: 0 });
-  }
-  stop = () => this.running = false;
-
-  state = { counter: 0 };
-  componentWillUpdate() {
-    if (this.running) {
-      this.setState({ counter: this.state.counter + 1 });
-    }
-  }
-  render() {
-    return (
-      <div>
-        <div>{this.state.counter}</div>
-        <div>
-          <button onClick={this.start}>start</button>
-          <button onClick={this.stop}>stop</button>
-        </div>
-      </div>
-    )
-  }
-}
-
-render(
-  <div>
-    <Comp />
-  </div>
-  , document.getElementById('root'),
-);
