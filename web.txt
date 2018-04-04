@@ -12,6 +12,7 @@ W3C spec
  2nd) CR(candidate recommendation): ensure its implementability among development community; significant features are mostly decided;
  3rd) PR(proposed recommendation): submitted to w3c advisory council for final approval; last call for feedback;
  4th) REC(recommendation): ready for deployment to public;
+ 5th) RT(retired)
  *) standards may define levels of conformance for developer to follow; 
  *) Normative: details implementors should conform to;
  *) Informative: examples and explanations;
@@ -19,6 +20,29 @@ W3C spec
 =====================================================
 @) OWASP: Open Web App Security Project
 https://www.owasp.org
+
+### optimization
+- multiple domains to achieve parallel downloadings (two for each domain per spec); however too much cause dns lookup penalty.
+
+- cookie free domain for assets
+
+- `link` in header to ensure progressive rendering (some browsers intend to avoid reflow when find link in body, they don't render before loading done)
+
+- script at bottom (it prevents parallel downloading)
+
+- inline script and css boost responsiveness but lose caching.
+
+- static gif to palette PNG (PNG8)
+
+- optimize images with tool
+
+- no scaling images
+
+- iPhone only cache files less than 25k
+
+- preload assets for next page
+
+- postload assets unrelated for initial rendering.
 
 @) HOL(Head of Line) blocking: in FIFO sequence processing, the first in the task line blocks those after it;
  *) input buffered network switches; 

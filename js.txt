@@ -24,6 +24,32 @@ stage-3 - Candidate: complete spec and initial browser implementations.
 stage-4 - Finished: will be added to the next yearly release.
 
 ===============================================
+### optimization
+
+- batch style into class
+
+- batch new dom in container/fragment 
+
+- reduce doms (large number records: custom scrolling/empty hidden records + indexed DB (searching))
+
+- simple selector
+
+- cache dom reference
+
+- restraint offsetWidth/getComputedStyle (flush changes) 
+
+- requestAnimationFrame for manual animation 
+
+- event delegation
+
+- async loop
+
+- lazy binding
+
+- shorten scope chain (reduce closures) - wire to `this`
+
+- array > object indexing > switch > if/then
+
 @) base classes' prototype is a special instance of that class;
  *) Function.prototype is function which accepts any arguments and returns undefined;
 
@@ -389,7 +415,7 @@ run(tasks).then(function(rs){
 @) path should begin with specifier: ./ ../ /
 
 @) module codes execute after document being parsed(defer attribute of 'script' tag is implicitly set), in the order of presense, even inline one precedes external;
- *) 'async' is still functioning, which cause module executing immediately after being parsed;
+ *) 'async' is still functioning, which causes module executing immediately after being parsed;
 
 @) runs in strict mode implicitly; 
 
@@ -765,7 +791,7 @@ initial-scale - visual viewport
 
 #### scheduleWork/scheduleWorkImpl
  - find root
- - assign expirationTime to every node in the pass
+ - assign expirationTime to every node in the path
 
 #### performWork
   -> findHighestPriorityRoot                                                <---
@@ -814,6 +840,7 @@ initial-scale - visual viewport
  -> updateHostRoot => reconcileChildren 
 |
  -> updateClassComponent 
+    -> pushContextProvider
     
   current (alternate)?
   
@@ -821,10 +848,11 @@ initial-scale - visual viewport
   |
     -> object (update) : -> updateClassInstance
 
-  -> finishClassComponent -> render -> reconcileChildren
+  -> finishClassComponent -> render -> reconcileChildren -> invalidateContextProvider
 
 ##### mountClassInstance 
-  -> instance.context = getMaskedContext();
+  -> getUnmaskedContext from contextStackCursor
+  -> instance.context = getMaskedContext(unmasked);
   -> componentWillMount
 
 ##### updateClassInstance: shouldUpdate? 
@@ -896,6 +924,8 @@ initial-scale - visual viewport
 
 - React defines abstract API leaving for other renderer to implement, such as Component.updater.
 
+- element is dropped after fiber is created.
+
 - batchedUpdates: if in batched updating & rendering process, `performWork` will not be invoked.
 
 - pull update instead of push update
@@ -939,7 +969,7 @@ initial-scale - visual viewport
 
 - adopt requestIdleCallback to invoke async performWork.
 
-- all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of each instance.
+- all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of instance of context provider. The nearest context is pointed by `contextStackCursor` (**not the one in ReactFiberHostContext**)
 
 @) requestAnimationFrame
 

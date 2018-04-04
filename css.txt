@@ -13,6 +13,16 @@ sass
 ------------------------------------------------------------
 inline	->	id	->	attr & class	-> element & pseudo element
 
+### optimization
+- shorthand
+- composite selectors to composite name
+- trigger GPU (transition, 3d transform, canvas, WebGL)
+- absolute/fixed position animationed target
+- too slight animation steps to achieve better smoothness may cause cpu jagging, then instead diminish smoothness.
+- avoid table layout (element after affect those before, them multiple passes are needed), or set `table-layout: fixed`
+- limit the class scope (as nearer as possible to the target) 
+
+
 @) BEM naming:
  *) Block: .block
  *) Element: .block__elm
@@ -127,16 +137,20 @@ inline	->	id	->	attr & class	-> element & pseudo element
 
 
 @) 3d:
- *) space, e.g. distance from user to the z=0 plane(if not set, always 2 dimensions); the smaller the closer and the bigger:
- 	.) container:
-		perspective:100px;
-	.) itself(placed before 3d transformation or no effect):
-		transform: perspective(100px) rotateY(45deg)
+ *) space, e.g. distance from user/camera/container to the z=0 plane (where the scene is exactly contained in camera)
+  .) if not set, always 2 dimensions;
+  .) determines the distance (positive) translateZ can apply, when bigger than space/perspective, it disappears;
+ 	.) set in container: perspective:100px;
+	.) set in itself(placed before 3d transformation or no effect): transform: perspective(100px) rotateY(45deg)
+
+                         _
+      _        +z       | |     -z
+     |_|      <----     |_|    ---->
+
+     camera           z=0 plane 
+
  *) viewer stand point(vanishing point):
  	perspective-origin: 0 0;
- *) z=0 plane is screen; positive translateZ move element toward user(becomes larger); when bigger than perspective, it disappears;
- 	transform: translateZ(101px);
- *) to move an element's z=0 plane, set translateZ to its ancestor;
  *) don't show from back:
  	backface-visibility:hidden;
  	transform: rotateY(91deg);
