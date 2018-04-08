@@ -779,6 +779,30 @@ initial-scale - visual viewport
  *) devServer publicPath has to ends with slash
  *) cloneElement to assign extra props or replace children.
 
+* mutate children without key is bad practice, or set deleted element to null to maintain correct children mapping.
+  **fiber is reused only when key and type are both matched**
+1.
+```
+  !removed ?
+  <div>
+    <div key='div1' > div1 </div>
+    <div key='div2' > div2 </div>
+  </div>
+  :
+  <div>
+    <div key='div2' > div2 </div>
+  </div>
+```
+2.
+```
+  <div>
+{
+    !removed ? <div key='div1' > div1 </div> : null
+}
+    <div key='div2' > div2 </div>
+  </div>
+```
+
 ### Flowing
 
 #### Init
@@ -788,6 +812,29 @@ initial-scale - visual viewport
 #### Render
 
  ReactDom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates/DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork/scheduleWorkImpl -> requestWork(fiberRoot) -> performWork
+
+#### requestWork
+
+1. add this requested `root` into scheduling roots chain.
+
+2. in batching update?
+  - true
+    requested update is unbatching?
+      - true: performWorkOnRoot
+      - false: return
+
+  - false
+    Sych?
+      - true: performWork
+      - false: scheduleCallbackWithExpiration
+
+#### unbatchedUpdates
+in baching updates && not in unbatching updates ?
+  - true
+    1. flag on unbatching update
+    2. invoke
+  - false
+    invoke.
 
 #### scheduleWork/scheduleWorkImpl
  - find root
@@ -804,7 +851,7 @@ initial-scale - visual viewport
 #### performWorkOnRoot (wrapped in `isRendering` lock) 
   -> renderRoot
       
-      -> createWorkInProgress (nextUnitOfWork = root.current.alternate)
+      -> nextUnitOfWork = createWorkInProgress()
            
       -> workLoop (by invokeGuardedCallback$1) <----------------------------------------
           -> performUnitOfWork(nextUnitOfWork) (looping through nextUnitOfWork)         |
@@ -834,6 +881,8 @@ initial-scale - visual viewport
  | (no return value)
  -> completeUnitOfWork
 
+##### bailoutOnAlreadyFinishedWork: when no need to update, return child.alternate for next loop
+ -> cloneChildFibers: attach child.alternate to this.alternate.child
 
 ##### beginWork
 
@@ -865,9 +914,15 @@ initial-scale - visual viewport
   -> flag componentDidUpdate
   -> store props & state
 
+##### effects
+
+- Placement: when create, insert DOM
+
 ##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
-##### reconcileChildren (reconcileChildrenAtExpirationTime) - attatch child fiber
+##### createWorkInProgress: create/return alternate
+
+##### reconcileChildren (reconcileChildrenAtExpirationTime): update fibers based on new elements.
 
   current?
 
@@ -881,9 +936,14 @@ initial-scale - visual viewport
 ##### reconcileChildFibers 
  - react.element
 
-    -> reconcileSingleElement  -> createFiberFromElement
+    -> reconcileSingleElement  -> [new?]
+                                  - true: createFiberFromElement
+                                  - false: 
+                                    -> [fiber matched?]
+                                      - useFiber => createWorkInProgress
+                                      - deleteChild -> createFiberFromElement
 
-    -> placeSingleChild 
+    -> placeSingleChild: flag Placement if new
 
 ##### completeUnitOfWork - looping to unwind up until sibling exists, then passing back to workLoop. When the last sibling finished, it continues unwinding to parent. The process runs until root reached.
 
