@@ -62,6 +62,8 @@ stage-4 - Finished: will be added to the next yearly release.
  *) lookbehind:	?<=, ?<! 
  *) non-capture:	?:
  *) non-greedy: ? after +/*
+
+@) function.prototype defaults to { constructor: [itself] }.
 ----------------------------------------------
 --	ES6
 -- http://es6-features.org/
@@ -863,13 +865,19 @@ in baching updates && not in unbatching updates ?
           <- [next]
      \/ root.current.alternate
       
-  -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
-                           -> root.current = alternate
-                           -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent)
-                                                                     -> commitCallbacks (ClassComponent, HostRoot)
-                                                                     -> commitMount (HostComponent)
-                                                 -> commitAttachRef
-                                                 -> commitErrorHandling -> componentDidCatch (catch errors of descendents only)
+  -> commitRoot(alternate) 
+     -> prepareForCommit => disable events
+     -> commitAllHostEffects -> commitPlacement
+                            |
+                             -> commitDeletion
+                            |
+                             -> Update: commitWork
+     -> root.current = alternate
+     -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent & Update)
+                                               -> commitCallbacks (ClassComponent, HostRoot)
+                                               -> commitMount (HostComponent & Update)
+                           -> commitAttachRef
+                           -> commitErrorHandling -> componentDidCatch (catch errors of descendents only)
      \/ alternate.expirationTime
       
   -> root.remainingExpirationTime = <return>
@@ -888,16 +896,19 @@ in baching updates && not in unbatching updates ?
 
  -> updateHostRoot => reconcileChildren 
 |
+ -> mountIndeterminateComponent -> adoptClassInstance -> mountClassInstance -> finishClassComponent 
+|
  -> updateClassComponent 
+
     -> pushContextProvider
     
-  current (alternate)?
-  
-    -> null (mount) : constructClassInstance -> mountClassInstance -> processUpdateQueue 
-  |
-    -> object (update) : -> updateClassInstance
+    current?
+    
+     -> null (mount) : constructClassInstance => adoptClassInstance -> mountClassInstance -> processUpdateQueue 
+    |
+     -> object (update) : -> updateClassInstance
 
-  -> finishClassComponent -> render -> reconcileChildren -> invalidateContextProvider
+    -> finishClassComponent -> render -> reconcileChildren -> invalidateContextProvider
 
 ##### mountClassInstance 
   -> getUnmaskedContext from contextStackCursor
@@ -917,6 +928,13 @@ in baching updates && not in unbatching updates ?
 ##### effects
 
 - Placement: when create, insert DOM
+- ContentReset: clear text
+- Deletion: no longer exists.
+- Ref: clear ref.
+- Update 
+  - ClassComponent: componentDidMount/componentDidUpdate
+  - HostComponent: commitUpdate -> updateProperties, commitMount
+  - HostText: commitTextUpdate
 
 ##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
@@ -933,7 +951,7 @@ in baching updates && not in unbatching updates ?
   <- workInProgress.child
 
 
-##### reconcileChildFibers 
+##### reconcileChildFibers: flag modified fibers in effectTag and append to return's effect list.
  - react.element
 
     -> reconcileSingleElement  -> [new?]
@@ -946,6 +964,7 @@ in baching updates && not in unbatching updates ?
     -> placeSingleChild: flag Placement if new
 
 ##### completeUnitOfWork - looping to unwind up until sibling exists, then passing back to workLoop. When the last sibling finished, it continues unwinding to parent. The process runs until root reached.
+  - attach to return's effects forward-list. 
 
 ##### completeWork
 
@@ -967,9 +986,9 @@ in baching updates && not in unbatching updates ?
  ->  updater().enqueueSetState (store partialState in fiber.updateQueue) -> scheduleWork -> requestWork -> performWork
 
 ##### root.current.alternate.expirationTime
-  enqueueSetState (update.expirationTime = computeExpirationForFiber(fiber))
-    | expirationTime
-  scheduleWork/scheduleWorkImpl (update host's expirationTime - then findHighestPriorityRoot will find it again)
+  enqueueSetState
+    -> computeExpirationForFiber
+    -> scheduleWork/scheduleWorkImpl(fiber, expirationTime) (update host's expirationTime - then findHighestPriorityRoot will find it again)
   
 ### event flow
 
@@ -983,6 +1002,10 @@ in baching updates && not in unbatching updates ?
 ### Tips
 
 - React defines abstract API leaving for other renderer to implement, such as Component.updater.
+
+- fiber.firstEffect/lastEffect is forward-list of modified children fibers.
+
+- fiber.nextEffect points to next fiber of modified sibling.
 
 - element is dropped after fiber is created.
 
@@ -1013,7 +1036,10 @@ in baching updates && not in unbatching updates ?
 - a fiber corresponds to a component, representing a stack frame of function, which is a unit of work.
   There are a stack system internally, consisting of valueStack & fiberStack. Anything can be pushed into & poped out of the valueStack, with corresponding fiber into fiberStack.
 
-- fiber.stateNode is instance of Component/DOM
+- fiber
+  - stateNode is instance of Component/DOM
+  - type: element.type
+  - tag: category of element.type
 
 - Component instance
 
@@ -1023,6 +1049,29 @@ in baching updates && not in unbatching updates ?
 
 - HostComponent: native DOM
 
+- IndeterminateComponent:
+  - FunctionalComponent
+  -
+    ```
+      function () {
+        return {
+          render: function () {
+            return <div/>;
+          }
+        }
+      }
+    ```
+
+    helper: React.createClass/create-react-class
+
+    ```
+      createClass({
+        render: function () {
+          return <div/>;
+        }
+      });
+    ```
+
 - adopt postMessage to invoke requestAnimationFrame to ensure it runs after next repaint (before by default).
 
 - max frame rates is 120hz 
@@ -1031,13 +1080,25 @@ in baching updates && not in unbatching updates ?
 
 - all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of instance of context provider. The nearest context is pointed by `contextStackCursor` (**not the one in ReactFiberHostContext**)
 
+- pass ref to render
+```
+  function forwardRef(props, ref) {
+    return <Child {...props} ref={ref} />;
+  }
+
+  const Comp = React.forwardRef(forwardRef);
+
+  const refComp = React.createRef(); // points to Child;
+  <Comp ref={refComp} />
+```
+
 @) requestAnimationFrame
 
 - runs in the same rate with display device refresh rate
 
 - will pause when invisible
 
-- argument callback receiving is timestamp when this repaint starts. The same value passed to all callbacks.
+- the argument which callback receives is timestamp when this repaint starts. The same value is passed to all callbacks.
 
 @) requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
 
@@ -1047,7 +1108,7 @@ in baching updates && not in unbatching updates ?
  
 - browser context is created
 
-- previous page leaving confirming dialog is confirmed.
+- the confirming dialog when previous page leaves is confirmed.
 
 - webworker is created.
 
