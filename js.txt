@@ -828,7 +828,7 @@ initial-scale - visual viewport
   - false
     Sych?
       - true: performWork
-      - false: scheduleCallbackWithExpiration
+      - false: scheduleCallbackWithExpiration -> requestIdleCallback(performAsyncWork)
 
 #### unbatchedUpdates
 in baching updates && not in unbatching updates ?
@@ -840,7 +840,7 @@ in baching updates && not in unbatching updates ?
 
 #### scheduleWork/scheduleWorkImpl
  - find root
- - assign expirationTime to every node in the path
+ - assign expirationTime to every node above in the path
 
 #### performWork
   -> findHighestPriorityRoot                                                <---
@@ -933,8 +933,14 @@ in baching updates && not in unbatching updates ?
 - Ref: clear ref.
 - Update 
   - ClassComponent: componentDidMount/componentDidUpdate
-  - HostComponent: commitUpdate -> updateProperties, commitMount
+  - HostComponent: commitUpdate; commitMount
   - HostText: commitTextUpdate
+
+##### commitUpdate -> updateProperties;
+
+##### commitMount -> focus();
+
+##### unstable_AsyncComponent/AsyncComponent: flags `unstable_isAsyncReactComponent`.
 
 ##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
@@ -1002,6 +1008,8 @@ in baching updates && not in unbatching updates ?
 ### Tips
 
 - React defines abstract API leaving for other renderer to implement, such as Component.updater.
+
+- expirationTime is 1000+200ms.
 
 - fiber.firstEffect/lastEffect is forward-list of modified children fibers.
 
@@ -1076,9 +1084,9 @@ in baching updates && not in unbatching updates ?
 
 - max frame rates is 120hz 
 
-- adopt requestIdleCallback to invoke async performWork.
-
-- all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of instance of context provider. The nearest context is pointed by `contextStackCursor` (**not the one in ReactFiberHostContext**)
+- '__reactInternalMemoizedMergedChildContext' of instance of context provider is merged via 'assign' with result of getChildContext() and context in parent provider. 
+  * so the context in each provider contains all contexts in the ancestry above.
+  * The nearest context is pointed by `contextStackCursor` (**not the one with the same name in ReactFiberHostContext**)
 
 - pass ref to render
 ```
@@ -1251,3 +1259,5 @@ xhr.onload=function(){
 xhr.send();
 
 @) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
+
+@) ToInt32: adopts `floor`

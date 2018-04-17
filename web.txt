@@ -22,7 +22,7 @@ W3C spec
 https://www.owasp.org
 
 ### optimization
-- multiple domains to achieve parallel downloadings (two for each domain per spec); however too much cause dns lookup penalty.
+- multiple domains to achieve parallel downloadings (two for each domain per http 1.1); however too much cause dns lookup penalty.
 
 - cookie free domain for assets
 
@@ -85,8 +85,6 @@ architecture & design
 ## loadModules loads dependency modules first, which are stored in 'requires' field.
 
 ## modules has its own invokeQueue, which stores provider()/factory()/service()/... callback, which are called in `loadModules`
-
-## providers are stored in providerCache
 
 ## provider.$get() returns an instance, stored in instanceCache. All services of all modules are stored in a single cache, so duplicate names will override others.
 
@@ -377,7 +375,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 	.) extract all third-party libraries: minChunk:function(module, count){return module.resource && module.context.indexOf('node_modules')>-1;}
 	.) 'async': lazy load;
  *) AggressiveSplittingPlugin/AggressiveMergingPlugin: divide/merge chunks (?not suitable for cache, only http2);
- *) ProvidePlugin: ???;
+ *) ProvidePlugin: load module corresponding to variable
  *) DefinePlugin:define global constants;
  	.) accepts function;
 	.) if string, quotes is mandatory (JSON.stringify): {'process.env.name':'"str"'}
@@ -783,6 +781,9 @@ this.addEventListener('fetch', function(event) {
  *) server push
  *) header compression
 
+@) http/2 dependency tree priority model
+ * 
+
 @) idempotant functions: the result is the same when execute more than one times;
 
 @) Clickjacking: cover page with an iframe, which hosts a third-party page which accept user inputs(click/type);
@@ -968,6 +969,8 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
 - module.init: flag module loaded.
 
 - module.enable: store factory, load deps
+
+- when dependency number decreased to 0, `define` callback is invoked.
 
 @) test throwing error:
  * chai.expect(function() { fun(arg); }).throw(err);
