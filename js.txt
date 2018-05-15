@@ -66,6 +66,8 @@ stage-4 - Finished: will be added to the next yearly release.
  *) lookbehind:	?<=, ?<! 
  *) non-capture:	?:
  *) non-greedy: ? after +/*
+
+@) function.prototype defaults to { constructor: [itself] }.
 ----------------------------------------------
 --	ES6
 -- http://es6-features.org/
@@ -783,6 +785,30 @@ initial-scale - visual viewport
  *) devServer publicPath has to ends with slash
  *) cloneElement to assign extra props or replace children.
 
+* mutate children without key is bad practice, or set deleted element to null to maintain correct children mapping.
+  **fiber is reused only when key and type are both matched**
+1.
+```
+  !removed ?
+  <div>
+    <div key='div1' > div1 </div>
+    <div key='div2' > div2 </div>
+  </div>
+  :
+  <div>
+    <div key='div2' > div2 </div>
+  </div>
+```
+2.
+```
+  <div>
+{
+    !removed ? <div key='div1' > div1 </div> : null
+}
+    <div key='div2' > div2 </div>
+  </div>
+```
+
 ### Flowing
 
 #### Init
@@ -793,9 +819,32 @@ initial-scale - visual viewport
 
  ReactDom.render -> renderSubtreeIntoContainer -> DOMRenderer.unbatchedUpdates/DOMRenderer.updateContainer(childrenElement, fiberRoot) ->  scheduleTopLevelUpdate(fiber, childrenElement) ->  scheduleWork/scheduleWorkImpl -> requestWork(fiberRoot) -> performWork
 
+#### requestWork
+
+1. add this requested `root` into scheduling roots chain.
+
+2. in batching update?
+  - true
+    requested update is unbatching?
+      - true: performWorkOnRoot
+      - false: return
+
+  - false
+    Sych?
+      - true: performWork
+      - false: scheduleCallbackWithExpiration -> requestIdleCallback(performAsyncWork)
+
+#### unbatchedUpdates
+in baching updates && not in unbatching updates ?
+  - true
+    1. flag on unbatching update
+    2. invoke
+  - false
+    invoke.
+
 #### scheduleWork/scheduleWorkImpl
  - find root
- - assign expirationTime to every node in the path
+ - assign expirationTime to every node above in the path
 
 #### performWork
   -> findHighestPriorityRoot                                                <---
@@ -808,7 +857,7 @@ initial-scale - visual viewport
 #### performWorkOnRoot (wrapped in `isRendering` lock) 
   -> renderRoot
       
-      -> createWorkInProgress (nextUnitOfWork = root.current.alternate)
+      -> nextUnitOfWork = createWorkInProgress()
            
       -> workLoop (by invokeGuardedCallback$1) <----------------------------------------
           -> performUnitOfWork(nextUnitOfWork) (looping through nextUnitOfWork)         |
@@ -820,13 +869,19 @@ initial-scale - visual viewport
           <- [next]
      \/ root.current.alternate
       
-  -> commitRoot(alternate) -> commitAllHostEffects -> commitPlacement
-                           -> root.current = alternate
-                           -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent)
-                                                                     -> commitCallbacks (ClassComponent, HostRoot)
-                                                                     -> commitMount (HostComponent)
-                                                 -> commitAttachRef
-                                                 -> commitErrorHandling -> componentDidCatch (catch errors of descendents only)
+  -> commitRoot(alternate) 
+     -> prepareForCommit => disable events
+     -> commitAllHostEffects -> commitPlacement
+                            |
+                             -> commitDeletion
+                            |
+                             -> Update: commitWork
+     -> root.current = alternate
+     -> commitAllLifeCycle -> commitLifeCycles -> componentDidMount/componentDidUpdate (ClassComponent & Update)
+                                               -> commitCallbacks (ClassComponent, HostRoot)
+                                               -> commitMount (HostComponent & Update)
+                           -> commitAttachRef
+                           -> commitErrorHandling -> componentDidCatch (catch errors of descendents only)
      \/ alternate.expirationTime
       
   -> root.remainingExpirationTime = <return>
@@ -838,21 +893,26 @@ initial-scale - visual viewport
  | (no return value)
  -> completeUnitOfWork
 
+##### bailoutOnAlreadyFinishedWork: when no need to update, return child.alternate for next loop
+ -> cloneChildFibers: attach child.alternate to this.alternate.child
 
 ##### beginWork
 
  -> updateHostRoot => reconcileChildren 
 |
+ -> mountIndeterminateComponent -> adoptClassInstance -> mountClassInstance -> finishClassComponent 
+|
  -> updateClassComponent 
+
     -> pushContextProvider
     
-  current (alternate)?
-  
-    -> null (mount) : constructClassInstance -> mountClassInstance -> processUpdateQueue 
-  |
-    -> object (update) : -> updateClassInstance
+    current?
+    
+     -> null (mount) : constructClassInstance => adoptClassInstance -> mountClassInstance -> processUpdateQueue 
+    |
+     -> object (update) : -> updateClassInstance
 
-  -> finishClassComponent -> render -> reconcileChildren -> invalidateContextProvider
+    -> finishClassComponent -> render -> reconcileChildren -> invalidateContextProvider
 
 ##### mountClassInstance 
   -> getUnmaskedContext from contextStackCursor
@@ -869,9 +929,28 @@ initial-scale - visual viewport
   -> flag componentDidUpdate
   -> store props & state
 
+##### effects
+
+- Placement: when create, insert DOM
+- ContentReset: clear text
+- Deletion: no longer exists.
+- Ref: clear ref.
+- Update 
+  - ClassComponent: componentDidMount/componentDidUpdate
+  - HostComponent: commitUpdate; commitMount
+  - HostText: commitTextUpdate
+
+##### commitUpdate -> updateProperties;
+
+##### commitMount -> focus();
+
+##### unstable_AsyncComponent/AsyncComponent: flags `unstable_isAsyncReactComponent`.
+
 ##### processUpdateQueue is called after: callComponentWillMount, callComponentWillReceiveProps,  pushHostRootContext
 
-##### reconcileChildren (reconcileChildrenAtExpirationTime) - attatch child fiber
+##### createWorkInProgress: create/return alternate
+
+##### reconcileChildren (reconcileChildrenAtExpirationTime): update fibers based on new elements.
 
   current?
 
@@ -882,14 +961,20 @@ initial-scale - visual viewport
   <- workInProgress.child
 
 
-##### reconcileChildFibers 
+##### reconcileChildFibers: flag modified fibers in effectTag and append to return's effect list.
  - react.element
 
-    -> reconcileSingleElement  -> createFiberFromElement
+    -> reconcileSingleElement  -> [new?]
+                                  - true: createFiberFromElement
+                                  - false: 
+                                    -> [fiber matched?]
+                                      - useFiber => createWorkInProgress
+                                      - deleteChild -> createFiberFromElement
 
-    -> placeSingleChild 
+    -> placeSingleChild: flag Placement if new
 
 ##### completeUnitOfWork - looping to unwind up until sibling exists, then passing back to workLoop. When the last sibling finished, it continues unwinding to parent. The process runs until root reached.
+  - attach to return's effects forward-list. 
 
 ##### completeWork
 
@@ -911,9 +996,9 @@ initial-scale - visual viewport
  ->  updater().enqueueSetState (store partialState in fiber.updateQueue) -> scheduleWork -> requestWork -> performWork
 
 ##### root.current.alternate.expirationTime
-  enqueueSetState (update.expirationTime = computeExpirationForFiber(fiber))
-    | expirationTime
-  scheduleWork/scheduleWorkImpl (update host's expirationTime - then findHighestPriorityRoot will find it again)
+  enqueueSetState
+    -> computeExpirationForFiber
+    -> scheduleWork/scheduleWorkImpl(fiber, expirationTime) (update host's expirationTime - then findHighestPriorityRoot will find it again)
   
 ### event flow
 
@@ -927,6 +1012,12 @@ initial-scale - visual viewport
 ### Tips
 
 - React defines abstract API leaving for other renderer to implement, such as Component.updater.
+
+- expirationTime is 1000+200ms.
+
+- fiber.firstEffect/lastEffect is forward-list of modified children fibers.
+
+- fiber.nextEffect points to next fiber of modified sibling.
 
 - element is dropped after fiber is created.
 
@@ -957,7 +1048,10 @@ initial-scale - visual viewport
 - a fiber corresponds to a component, representing a stack frame of function, which is a unit of work.
   There are a stack system internally, consisting of valueStack & fiberStack. Anything can be pushed into & poped out of the valueStack, with corresponding fiber into fiberStack.
 
-- fiber.stateNode is instance of Component/DOM
+- fiber
+  - stateNode is instance of Component/DOM
+  - type: element.type
+  - tag: category of element.type
 
 - Component instance
 
@@ -967,13 +1061,48 @@ initial-scale - visual viewport
 
 - HostComponent: native DOM
 
+- IndeterminateComponent:
+  - FunctionalComponent
+  -
+    ```
+      function () {
+        return {
+          render: function () {
+            return <div/>;
+          }
+        }
+      }
+    ```
+
+    helper: React.createClass/create-react-class
+
+    ```
+      createClass({
+        render: function () {
+          return <div/>;
+        }
+      });
+    ```
+
 - adopt postMessage to invoke requestAnimationFrame to ensure it runs after next repaint (before by default).
 
 - max frame rates is 120hz 
 
-- adopt requestIdleCallback to invoke async performWork.
+- '__reactInternalMemoizedMergedChildContext' of instance of context provider is merged via 'assign' with result of getChildContext() and context in parent provider. 
+  * so the context in each provider contains all contexts in the ancestry above.
+  * The nearest context is pointed by `contextStackCursor` (**not the one with the same name in ReactFiberHostContext**)
 
-- all contexts of ancestors are cumulated with assign, stored in '__reactInternalMemoizedMergedChildContext' of instance of context provider. The nearest context is pointed by `contextStackCursor` (**not the one in ReactFiberHostContext**)
+- pass ref to render
+```
+  function forwardRef(props, ref) {
+    return <Child {...props} ref={ref} />;
+  }
+
+  const Comp = React.forwardRef(forwardRef);
+
+  const refComp = React.createRef(); // points to Child;
+  <Comp ref={refComp} />
+```
 
 @) requestAnimationFrame
 
@@ -981,7 +1110,7 @@ initial-scale - visual viewport
 
 - will pause when invisible
 
-- argument callback receiving is timestamp when this repaint starts. The same value passed to all callbacks.
+- the argument which callback receives is timestamp when this repaint starts. The same value is passed to all callbacks.
 
 @) requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
 
@@ -991,7 +1120,7 @@ initial-scale - visual viewport
  
 - browser context is created
 
-- previous page leaving confirming dialog is confirmed.
+- the confirming dialog when previous page leaves is confirmed.
 
 - webworker is created.
 
@@ -1141,3 +1270,5 @@ xhr.onload=function(){
 xhr.send();
 
 @) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
+
+@) ToInt32: adopts `floor`
