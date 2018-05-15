@@ -53,6 +53,8 @@ https://www.owasp.org
 
 @) header Content-Security-Policy: specify valid resources uri;
 
+`Content-Security-Policy: frame-src https://example.com/`
+
 @) normalized table:
  1st) primary key; atomic value; no repeating columns(value1, value2, value3...);
  2nd) non-key columns depends on primary key;
@@ -762,7 +764,7 @@ Authorization: <type> <credentials>
  *) work in background:
  	.) push: server initiates
 		self.onpush=function(){}/self.addEventListener('push', ...);
-	.) sync: agent initates; 
+	.) sync: agent initiates; 
 
 this.addEventListener('fetch', function(event) {
     event.respondWith(caches.match(cacheNames['static'], event.request.url).catch(function() {

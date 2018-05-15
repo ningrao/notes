@@ -50,6 +50,10 @@ stage-4 - Finished: will be added to the next yearly release.
 
 - array > object indexing > switch > if/then
 
+## task queue
+* macrotasks: setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
+* microtasks: process.nextTick, Promises, Object.observe, MutationObserver
+
 @) base classes' prototype is a special instance of that class;
  *) Function.prototype is function which accepts any arguments and returns undefined;
 
@@ -1062,13 +1066,20 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 -----------
 
 @) fetch(https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch);
- *) cors: dictate browser whether to send, header from serer is still checked;
- *) no-cors(default): header is not required, but methods and response properties are restricted, and error message is opaque if server rejected;
- *) overwrite 'no-cors' with 'same-origin'/'cors' explicitly;
- *) stream
+ *) cors(default): dictate browser whether to send, check access control header from server;
+ *) no-cors: access control header is not required, but methods, headers and response properties are restricted, and error message is opaque if server rejected;
+ *) stream: response.body - ReadableStream
  *) cache
  *) include cookie: credentials:'include'
  *) http error status is not rejected; 
+ *) redirect is not accessible in case private data is contained in target url.
+
+@) reponse type
+- error: 
+
+  if csp is violated, this type is returned.
+
+@) Access-Control-Expose-Headers
 
 @) observable stream supply values and call handlers multiple times, whereas promise only once; 
  *) promise:
@@ -1084,7 +1095,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 
 @) immutable.js (Persistent data structures; structural sharing)
  *) access fields via array: {fieldA:{fieldB:{fieldC:1}}}	-> ['fieldA','fieldB','fieldC']
- *) employ 'Seq' or 'withMutations' to aplly batch mutation to emit once;
+ *) employ 'Seq' or 'withMutations' to apply batch mutation to emit once;
 
 @) response can be read only once, so clone it before read for later use:
 	cache.put(key, response.clone());
