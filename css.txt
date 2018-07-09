@@ -106,8 +106,8 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) each column has the same width(column-fill:balance controlls content to spread equally);
 
 
-@) visibility:collapse works only in row/column, or equal to hidden;
- *) different from 'none', which would not affect the layout of cells;
+@) visibility:collapse works only in row/column/flex-item (not `display:table-*`), or equal to hidden;
+ set main-size to zero and keeps the cross-size untouched.
 
 @) 7 layouts: block, inline, table, positioned, column, flex, grid;
 
@@ -122,10 +122,30 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space appor shrinked space;
  *) flex-wrap:wrap; grow/shrink no need to exist;
  *) if no flex-grow/shrink is specified, fill based on the propotion of their basis;
- *) align: justify-content/align-items
+
+ *) align: 
+
+   - main-axis: justify-content
+
+     flex-start | flex-end | center | space-between | space-around 
+
+   - cross-axis
+
+     [auto |] flex-start | flex-end | center | baseline | stretch 
+
+     - align-items: on container, default for all items
+     - align-self: on item itself
+
+     flex-start | flex-end | center | space-between | space-around | stretch 
+
+     - align-content: multi-line only
+
+   * stretch: expand to the same size
+
  *) flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
  *) flex-flow: direction + wrap.
  *) by default grow/shrink respect their ratio of flex-basis.
+
 
 
 @) grid

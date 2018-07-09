@@ -7,16 +7,16 @@ can route with plain link?
 >> ECMA-262: for ECMAScript;
 >> ISO/IEC 16262: equivalent to ECMA-262; usually these standards are proposed and approved in ISO/IEC(International Electrotechnical Commission) JTC(Joint Technical Committee) 1, which also give it a number;
 
- *) when a new version is issued, the old one is withdrawn automatically;
+ * when a new version is issued, the old one is withdrawn automatically;
 
- *) regex
+ * regex
  	`(?:.*)` - non-capturing
  	`.*?=` - lookahead positive
  	`.*?!` - lookahead negative
  	`?<=.*` - lookbehind positive
  	`?<!.*` - lookbehind negative
 
- *) stages:
+ * stages:
 stage-0 - Strawman: just an idea, possible Babel plugin.
 stage-1 - Proposal: this is worth working on.
 stage-2 - Draft: initial spec.
@@ -54,48 +54,48 @@ stage-4 - Finished: will be added to the next yearly release.
 * macrotasks: setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
 * microtasks: process.nextTick, Promises, Object.observe, MutationObserver
 
-@) base classes' prototype is a special instance of that class;
- *) Function.prototype is function which accepts any arguments and returns undefined;
+- base classes' prototype is a special instance of that class;
+ * Function.prototype is function which accepts any arguments and returns undefined;
 
-@) shortcut to call method as function:
+- shortcut to call method as function:
 	(0, host.method)();
 'host.method' treated as an expression;
 
-@) regexp
- *) lookahead:	?=, ?! 
- *) lookbehind:	?<=, ?<! 
- *) non-capture:	?:
- *) non-greedy: ? after +/*
+- regexp
+ * lookahead:	?=, ?! 
+ * lookbehind:	`?<=`, `?<! `
+ * non-capture:	?:
+ * non-greedy: ? after `+/*`
 
-@) function.prototype defaults to { constructor: [itself] }.
-----------------------------------------------
---	ES6
--- http://es6-features.org/
-----------------------------------------------
-@) cookie is inaccessible if set 'httpOnly';
+- function.prototype defaults to { constructor: [itself] }.
 
-@) setPrototypeOf() to change __proto__ of an instance;
+#	ES6
+ http://es6-features.org/
 
-@) no 'strict mode' in function with non-simple paramenter list(default/rest/destructure);
+- cookie is inaccessible if set 'httpOnly';
+
+- setPrototypeOf() to change __proto__ of an instance;
+
+- no 'strict mode' in function with non-simple paramenter list(default/rest/destructure);
 	because: function arguments and body should be parsed in the same mode; 'strict mode' in body will cause re-parsing;
 
-@) default param;
- *) the previous param can be used for latter ones:
+- default param;
+ * the previous param can be used for latter ones:
  	function add(first, second = getValue(first))
- *) 'arguments' always reflect the parameters passed(its length don't count default values);
- *) 'arguments' is a copy like in 'strict mode';
- *) pass undefined to employ default;
+ * 'arguments' always reflect the parameters passed(its length don't count default values);
+ * 'arguments' is a copy like in 'strict mode';
+ * pass undefined to employ default;
 
-@) rest parameter(function(arg1, ...other)) isn't  counted in function's length(named parameters);
- *) if no named arguments, 'other'.length==='arguments'.length, but 'other'!=='arguments';
+- rest parameter(function(arg1, ...other)) isn't  counted in function's length(named parameters);
+ * if no named arguments, 'other'.length==='arguments'.length, but 'other'!=='arguments';
 
-@) spread arguments:
+- spread arguments:
 	fun(...argsArr)	<==>	fun.apply(null, argsArr)
 
-@) block scope(let, const);
- *) doesn't hoist declaration;
- *) no duplicate declaration(different from variable shadowing);
- *) TDZ(temporal dead zone): when a block scope variable is declared, the code in the same or within the scope of which, accessing it(even typeof) incurs error;
+- block scope(let, const);
+ * doesn't hoist declaration;
+ * no duplicate declaration(different from variable shadowing);
+ * TDZ(temporal dead zone): when a block scope variable is declared, the code in the same or within the scope of which, accessing it(even typeof) incurs error;
  	function(){
 		alert(typeof var1); //error
 		if(1){
@@ -103,24 +103,25 @@ stage-4 - Finished: will be added to the next yearly release.
 		}
 		let var1=1;
 	}
- *) when in global scope, value is not assigned to global object property, instead it's shadowed;
- *) 'let' in loop is handled specially, a new scope is created each time, like a function invocation;
+ * when in global scope, value is not assigned to global object property, instead it's shadowed;
+ * 'let' in loop is handled specially, a new scope is created each time, like a function invocation;
 let len='len1';		--scope 1
 for(let i=0, len='len2'; i<3; i++, len+='a', console.log(len)){		--scope 2
 	let len='len3';		--scope3
 	let str=i+len;
 	console.log(str);
 }
- *) the variable in iteration loop(for...in / for...of) is not modified, instead it's assigned a new binding each time;
-	[valid]: for(const key in obj){}
+ * the variable in iteration loop(for...in / for-of) is not modified, instead a new scope is created each time.
+
+	this is valid: `for(const key in obj){}`
  	
-@) function:
- *) each function has a 'name' for debugging;
- *) when called with new, new.target===function
- *) block level function is valid(not only function expression); 
+- function:
+ * each function has a 'name' for debugging;
+ * when called with new, new.target===function
+ * block level function is valid(not only function expression); 
  	.) when in 'strict mode', its hoisted to the top of block;
 	.) to traditional scope top if not; 
- *) arrow function(fun= arg1=>arg1)
+ * arrow function(fun= arg1=>arg1)
  	.) when single statement **without curly brackets**, a 'return' is prepended to it;
 
 		**`()=>{1}` : return nothing;**
@@ -130,50 +131,50 @@ for(let i=0, len='len2'; i<3; i++, len+='a', console.log(len)){		--scope 2
 	.) arguments conform to 'strict mode' even not in it;
 	.) return {}: ()=>({})
 	.) **in object/prototype, 'this' is not the instance**
- *) in strict mode, tail call is optimized;
+ * in strict mode, tail call is optimized;
 
-@) object literal:
- *) shorthand: 
+- object literal:
+ * shorthand: 
  	let name='tom';
 	let per={name:name}		->		let per={name}
- *) concise method(no 'function'):
+ * concise method(no 'function'):
  	{name:'tom', say(){}}
- *) variable key:
+ * variable key:
  	let key1='key1', key2='key2';
 	let obj={
 		[key1]:'val'
 		,[key2](){}
 	}
 
-@) 'Object.is()'	<=> '==='; except:
- *) +0===-0	-> true;	Object.is(+0, -1) -> false
- *) NaN===NaN	-> false;	Object.is(NaN, NaN) -> true
+- 'Object.is()'	<=> '==='; except:
+ * +0===-0	-> true;	Object.is(+0, -1) -> false
+ * NaN===NaN	-> false;	Object.is(NaN, NaN) -> true
 
-@) copy property:
- *) Object.assign(), adopt '=' to copy, so no accessor property is copied;
- *) Object.assign(), adopt 'for in' to enumerate, so non-enumerable property is not copied;
- *) Object.mixin(), also copy accessor property, but no methods;
+- copy property:
+ * Object.assign(), adopt '=' to copy, so no accessor property is copied;
+ * Object.assign(), adopt 'for in' to enumerate, so non-enumerable property is not copied;
+ * Object.mixin(), also copy accessor property, but no methods;
 
 
-@) own property enumerating order:
+- own property enumerating order:
 numeric(ascending) -> string(appear) -> symbol(appear);
- **) only applied to Object.getOwnPropertyNames()/Reflect.ownKeys(); except for 'for in'/Object.keys()/JSON.stringify();
+ + only applied to Object.getOwnPropertyNames()/Reflect.ownKeys(); except for 'for in'/Object.keys()/JSON.stringify();
 
 
-@) string
- *) code point is the actual data size of a char;
- *) code unit is the basic size of a char for an encoding(16 bits for utf16);
- *) utf16 char may occupy two code units(Basic Multilingual Plane + Supplementary plane -> surrogate pair), 
- *) String.length calc number of units instead of points; incorrect for char of two units, fix:
+- string
+ * code point is the actual data size of a char;
+ * code unit is the basic size of a char for an encoding(16 bits for utf16);
+ * utf16 char may occupy two code units(Basic Multilingual Plane + Supplementary plane -> surrogate pair), 
+ * String.length calc number of units instead of points; incorrect for char of two units, fix:
  	String.match(/./gu).length
- *) subscript is also based on code unit, for+of fixes this;
- *) regex matching start point:
+ * subscript is also based on code unit, for+of fixes this;
+ * regex matching start point:
  	.) no flag: 0
 	.) 'g': lastIndex and forward
 	.) 'y': lastIndex (not to forward)
- *) [tagged] template literal (backquotes):	
+ * [tagged] template literal (backquotes):	
 	 function filterFun(parts, ...substitutes){};
-		**) parts always have more than one elements than substitutes;
+		+ parts always have more than one elements than substitutes;
 	.) new line is allowed;
 		```
 		 let str1=filterFun`abc ${expr}
@@ -212,12 +213,12 @@ numeric(ascending) -> string(appear) -> symbol(appear);
 
 
 
-@) super to access prototype methods in overriden:
+- super to access prototype methods in overriden:
 Object.getPrototypeOf(this).method1.call(this)	=>	super.method1();
- *) only works in concise style method;
- *) works in multiple level inheritance(the traditional way is not, which cause stack overflow error);
+ * only works in concise style method;
+ * works in multiple level inheritance(the traditional way is not, which cause stack overflow error);
 
-@) destructuring(also applied for parameters declaration):
+- destructuring(also applied for parameters declaration):
 let node = {
 	type: "Identifier",
 	name: "foo",
@@ -238,64 +239,68 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 				default value;			|				omit;		|							default value(if none, error occurs)
 										new name;					rest all elements;
 
- *) initializer is mandatory:
+ * initializer is mandatory:
  	let {var1, var2};		--error since no value assigned;
- *) when assign values, parentheses is required for object:
+ * when assign values, parentheses is required for object:
  	({var1}=obj);
- *) value assigned should not be non-existent, if then error occurs;
+ * value assigned should not be non-existent, if then error occurs;
  	'node' should not be undefined; 
 
-@) symbol 
- *) type can't be coerced to other type, if then error occurs(toString works, no '+' etc.);
- *) Symbol is not a constructor
- *) when used as key, not enumerable by default (defineProperty to specify);
- *) Symbol.for/keyFor to create/retrieve global symbols/keys;
+- symbol 
+ * type can't be coerced to other type, if then error occurs(toString works, no '+' etc.);
+ * Symbol is not a constructor
+ * when used as key, not enumerable by default (defineProperty to specify);
+ * Symbol.for/keyFor to create/retrieve global symbols/keys;
 
-@) Constructor.prototype[Symbol.toStringTag] determines what returned by Object.prototype.toString.call(inst); which is also the result of Constructor.prototype.toString if not overriden;
+- Constructor.prototype[Symbol.toStringTag] determines what returned by Object.prototype.toString.call(inst); which is also the result of Constructor.prototype.toString if not overriden;
 
-@) Set
- *) unique
- *) no index
- *) Object.is() to check duplicate;
- *) duplicate value is dropped silently;
+- Set
+ * unique
+ * no index
+ * Object.is() to check duplicate;
+ * duplicate value is dropped silently;
 
-@)WeakSet (used to track references to 'object value')
- *) nonobject(including null) throws error;
- *) when no references to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
- *) no iterator;
- *) no size;
+-WeakSet (used to track references to 'object value')
+ * nonobject(including null) throws error;
+ * when no references to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
+ * no iterator;
+ * no size;
 
-@) Map
- *) not to coerce key into string as object;
- *) WeakMap only applies 'weak' to key; value still can be any type;
+- Map
+ * not to coerce key into string as object;
+ * WeakMap only applies 'weak' to key; value still can be any type;
 
-@) WEAK Collection: for 'Tag' an object
- *) only able to check if an object exists (tag the object with this set);
- *) no way to check if is empty;
- *) automate garbage collection;
- *) to iterate:
+- WEAK Collection: for 'Tag' an object
+ * only able to check if an object exists (tag the object with this set);
+ * no way to check if is empty;
+ * automate garbage collection;
+ * to iterate:
    const it = keys()/entries();
    it.next();
 
-@) Promise
- *) in executor, error thrown(implicit try/catch exists) or passed to reject is passed to 'catch';
- *) the rejected value, if no reject handler, is passed to 'catch', if no 'catch', then passed to global promise handler, if still none, error unhandled;
- *) resolve()/reject() creates a resolved/rejected promise, passed the parameter as result to corresponding handler;
-	**) if an object with 'then' method is passed, 'then' is called as the new promise's executor;
-	**) 'promise' as the parameter
-    *) resolve() relay it as the returned promise.
-    *) reject() still treat it as the result to reject handler.
- *) then(onResolve, onReject) / catch(onReject) returns a new promise;
+- Promise
+ * in executor, error thrown(implicit try/catch exists) or passed to reject is passed to 'catch';
+  + value returned has nonsense.
+ * the rejected value, if no reject handler, is passed to 'catch', if no 'catch', then passed to global promise handler, if still none, error unhandled;
+ * resolve()/reject() creates a resolved/rejected promise, passed the parameter as result to corresponding handler;
+	+ if an object with 'then' method is passed, 'then' is called as the new promise's executor;
+	+ 'promise' as the parameter
+    * resolve() relay it as the returned promise.
+    * reject() still treat it as the result to reject handler.
+ * then(onResolve, onReject) / catch(onReject) returns a new promise;
 	.) when error is thrown, the new promise is rejected;
  	.) returned value in both handler is passed to the new promise resolve();
 	.) if a promise is returned, its result is passed;
- *) in promise chain, if a reject handler exists, the following promise is fulfilled, unless error thrown in that handler also;
- *) its always async, even already resolved.
+ * in promise chain, if a reject handler exists, the following promise is fulfilled, unless error thrown in that handler also;
+ * its always async, even already resolved.
+ * promise.all 
+  + receives non promise item
+  + wait until all items comes to non-promise.
 
 
 @ use generator to convert async to sync syntax;
- *) callback(call next() in callback):
------------------------------------------------------------------
+ * callback(call next() in callback):
+   ```
 function doAct(act, ...args){
 	return function(cb){
 		act(...args, cb);
@@ -335,11 +340,11 @@ run(tasks, function(err, rs){
 	}
 });
 
------------------------------------------------------------------
+   ```
 
- *) promise(call next() in the previous promise fulfill handler):
-  ** is es7, to handle promise (converted to promise): generator '*' is replaced with 'async', yield with 'await' **
------------------------------------------------------------------
+ * promise(call next() in the previous promise fulfill handler):
+  ** is es7, to handle promise (converted to promise): generator `*` is replaced with 'async', yield with 'await' **
+  ```
 function act1(str){
 	console.log('act1 arg1 is:'+str);
 	return new Promise(function(resolve, reject){
@@ -389,149 +394,137 @@ run(tasks).then(function(rs){
 },function(err){
 	console.log('tasks failed:'+err);
 });
+  ```
 
-@) Class
- *) derived class set Symbol.species to it by default;
- *) extends accept expression;
- *) typeof() defined class is 'function';
- *) always call 'super(args)' as the first line in constructor of derived class;
- *) return value in constrcutor works as es5;
- *) derived class calls base constructor if no constructors defined.
- *) class properties initialization is placed in the last of contructor.
+- Class
+ * derived class set Symbol.species to it by default;
+ * extends accept expression;
+ * typeof() defined class is 'function';
+ * always call 'super(args)' as the first line in constructor of derived class;
+ * return value in constrcutor works as es5;
+ * derived class calls base constructor if no constructors defined.
+ * class properties initialization is placed in the last of contructor.
 ----------------------------------------------
 --	ES7
 -----------------------------------------------------------------------------------------
-@) exponential operator(**);
-@) Array.prototype.includes
- *) NaN can be found(indexOf can't, which uses '===');
+- exponential operator(**);
+- Array.prototype.includes
+ * NaN can be found(indexOf can't, which uses '===');
 
 
 ----------------------------------------------
 --	MODULE
 ----------------------------------------------
-@) static, e.g. load at compile time
+- static, e.g. load at compile time
  * import(), proposed dynamic import function.
 
-@) module/script are distinguished by loading method, instead of itself;
- *) script tag with type='module', whether src is present or not(inline); 
- *) new Worker(path, {type:'module'});
+- module/script are distinguished by loading method, instead of itself;
+ * script tag with type='module', whether src is present or not(inline); 
+ * new Worker(path, {type:'module'});
 	.) should use other module by 'import' instead of 'importScript'
 	.) can load from other origin with CORS;
 
-@) path should begin with specifier: ./ ../ /
+- path should begin with specifier: ./ ../ /
 
-@) module codes execute after document being parsed(defer attribute of 'script' tag is implicitly set), in the order of presense, even inline one precedes external;
- *) 'async' is still functioning, which causes module executing immediately after being parsed;
+- module codes execute after document being parsed(defer attribute of 'script' tag is implicitly set), in the order of presense, even inline one precedes external;
+ * 'async' is still functioning, which causes module executing immediately after being parsed;
 
-@) runs in strict mode implicitly; 
+- runs in strict mode implicitly; 
 
-@) html style comment is not allowed, which is a historic feature;
+- html style comment is not allowed, which is a historic feature;
 
-@) scope is not global, then 'this' is undefined;
+- scope is not global, then 'this' is undefined;
 
-@) import/export should resides at the outmost level, determinable by compiler; 
+- import/export should resides at the outmost level, determinable by compiler; 
 
-@) export:
- *) when declare:
+- export:
+ * when declare:
  	export let name;
- *) after declare:
+ * after declare:
  	export {name};
- *) default exported value is placed in a field named 'default';
+ * default exported value is placed in a field named 'default';
 
- *) export what imported:
- 	*) import field, export field;
-		export {name1 as Name1, name2} from path
-	*) import default, export as named field;
-		export { default as name } from path  =>  export name from path
-	*) import default, export as default;
-		export default from path
- *) export default:
+ * export what imported:
+    ????default value can not be reexported as default: 
+
+   * import field, export field;
+    export {name1 as Name1, name2} from path
+
+   * `export * from ''`  
+    imported default value is **discarded**.
+
+   * `export name from ''`  
+    imported default value is exported as **property** of 'name'.
+
+   * `export default from ''`  
+    imported default value is exported as default.
+ * export default:
 	.) export default val1=1; (**declare is invalid: `export default let a=1`**)
 	.) export {val1 as default}; (**val1 is substituted with name 'default' when `import *`**)
   .) default exported value is placed in a field named 'default'; so `import sth from` is short for `import {default as sth} from`
 
-*) export what imported:
-  *) import field, export field;
-    export {name1 as Name1, name2} from path
-  *) import default, export as named field;
-    export name from path
-  *) import default, export as default;
-    export default from path
-
-@) imort:
- *) only execute once no matter how many times it's imported;
- *) imort default:
+- imort:
+ * only execute once no matter how many times it's imported;
+ * imort default:
 	.) import defName, {va1} from path;
 	.) import {default as defName, va1} from path;
- *) alias:
+ * alias:
 	.) import {Name1 as NAME1, name2} from path
 
- *) import a module just to execute its code, without reference/binding;
+ * import a module just to execute its code, without reference/binding;
 	import path
 
- *) import as a whole object: 
+ * import as a whole object: 
 	import * as mod1 from path
 
- *) imported name is readonly; but can be modified inside that module, which will be reflected to binding; 
+ * imported name is readonly; but can be modified inside that module, which will be reflected to binding; 
 
-@) default value is included in `import * from` but not in `export * from`;
-
-@) `export from`
-	default value can not be reexported as default: 
-
- * `export * from ''`  
- 	imported default value is **discarded**.
-
- * `export name from ''`  
-	imported default value is exported as **property** of 'name'.
-
- * `export default from ''`  
-	imported default value is exported as default.
+- **default value is included in `import * from` but not in `export * from`**;
 
 -----------------------------------------------------------------------------------------
 GENERAL
 -----------------------------------------------------------------------------------------
-@) support html style comment;
+- support html style comment;
  
-@) XMLHttpRequest send only string converted from what ever type automatically if non-string passed;
+- XMLHttpRequest send only string converted from what ever type automatically if non-string passed;
 
-@) request data type is mandatory for server parsing, or it doesn't know what data format is which the body string represents;
- *) json: Content-Type:application/json; charset=utf-8
- *) urlencoded(form default): Content-Type:application/x-www-form-urlencoded
- *) file input type(if not set, file content will not be sent): multipart/form-data
- *) plain text(html5): text/plain
+- request data type is mandatory for server parsing, or it doesn't know what data format is which the body string represents;
+ * json: Content-Type:application/json; charset=utf-8
+ * urlencoded(form default): Content-Type:application/x-www-form-urlencoded
+ * file input type(if not set, file content will not be sent): multipart/form-data
+ * plain text(html5): text/plain
 
-@) function expression:
+- function expression:
  varFun=function(){}
 
-@) instanceof will always fail if the two parts belongs to two environment;
+- instanceof will always fail if the two parts belongs to two environment;
 
-@) isPrototpyeOf/getPrototpyeOf
+- isPrototpyeOf/getPrototpyeOf
 
-@) string is an readonly array; to invoke array methods on it, it's necessary to convert to array first (split('')); 
+- string is an readonly array; to invoke array methods on it, it's necessary to convert to array first (split('')); 
 
-@) 'in' test also check prototype;
+- 'in' test also check prototype;
 
-@) 'forEach' accepts a second param act as the host of callback function;
+- 'forEach' accepts a second param act as the host of callback function;
 
-@) Array:
- *) Array.isArray
- *) forEach/map/filter can't break;
- *) find/every/some terminates when result got;
- *) reduce/reduceRight accept an initial accumulated value passed in the first argument, if not, its the first element;
- *) copyWithin will not extend the array;
- *) of(el,el...);	from(array);
- *) reduce((accumulated, part, i)=>{} [,initialValue]);
- 	**) if initialValue is not supplied, 'accumulated' adopts the first element as its initial value, and 'i' starts from 1;
+- Array:
+ * Array.isArray
+ * forEach/map/filter can't break;
+ * find/every/some terminates when result got;
+ * reduce/reduceRight accept an initial accumulated value passed in the first argument, if not, its the first element;
+ * copyWithin will not extend the array;
+ * of(el,el...);	from(array);
+ * reduce((accumulated, part, i)=>{} [,initialValue]);
+ 	+ if initialValue is not supplied, 'accumulated' adopts the first element as its initial value, and 'i' starts from 1;
 
-@) TypedArray is not derived from Array;
- *) slice clones the buffer, subarray doesn't; 
+- TypedArray is not derived from Array;
+ * slice clones the buffer, subarray doesn't; 
 
-@) Object:
- *) Object.create: if no argument specified, the object has no builtin members; pass Object.prorotype to create a regular object;
- *) builtin property is not enumerable;
- *) keys()/getOwnPropertyNames()/getOwnPropertyDescriptor()/Object.prototype.properyIsEnumerable(prop) ;
- *) accessor property:
+- Object:
+ * Object.create: if no argument specified, the object has no builtin members; pass Object.prorotype to create a regular object;
+ * builtin property is not enumerable;
+ * keys()/getOwnPropertyNames()/getOwnPropertyDescriptor()/Object.prototype.properyIsEnumerable(prop) ;
+ * accessor property:
  	var obj={
 		_name:'',
 		get name(){
@@ -541,28 +534,28 @@ GENERAL
 			return this._name=n;
 		}
 	};
- *) Object.defineProperties(obj, {
+ * Object.defineProperties(obj, {
 	 	x:{value:1, configurable:true},
 	 	y:{
 			get:function(){},
 			enumerable:true
 		}
 	});
- *) enuerate own properties: Object.keys()/entries/values();
+ * enuerate own properties: Object.keys()/entries/values();
  	.) not instance object;
 	.) no builtin Symbol.iterator;
 
-@) 
+- 
 'for in'/keys()	--enumerable(inherited);
 in/getOwnPropertyNames()	--enumerable+unenumerable
 getOwnPropertySymbols()	--symbol properties
 Reflect.ownKeys()	--string+symbol
 
-@) iterator generator is a function with name with '*' prefix;
- *) default iterator generator used for 'for...of' has the function name '[Symbol.iterator]';
- *) types with builtin generator:
+- iterator generator is a function with name with '*' prefix;
+ * default iterator generator used for 'for...of' has the function name '[Symbol.iterator]';
+ * types with builtin generator:
 	 .) collections(array,map,set): entries(),values(),keys(); default: map(entries), array/set(values)
- *) the param passed to 'next()' is returned by the previous yield, which is the first command to execute:
+ * the param passed to 'next()' is returned by the previous yield, which is the first command to execute:
  	function *iteratorCreator(){
 		let nextParam=yield 1;
 		let nextParam+=10
@@ -573,9 +566,9 @@ Reflect.ownKeys()	--string+symbol
 	it.next(5)	-> 15
   ** the second next() pass data to the first yield. **
 
- *) if yield is not assigned to a variable, it.throw(new Error()) will not trigger error;
- *) when no 'yield' left, 'next()' returns {value:returnValue, done:true}; 'returnValue' is returned by 'return';
- *) when an iterator generator is 'yield'ed, this code line is replaced with codes in the generator;
+ * if yield is not assigned to a variable, it.throw(new Error()) will not trigger error;
+ * when no 'yield' left, 'next()' returns {value:returnValue, done:true}; 'returnValue' is returned by 'return';
+ * when an iterator generator is 'yield'ed, this code line is replaced with codes in the generator;
  	.) the syntax '*gen()' is only valid when following 'yield';
 	function *createNumberIterator() {
 		yield 1;
@@ -592,58 +585,58 @@ Reflect.ownKeys()	--string+symbol
 		yield true;
 	}
 
-@) accessor property:
- *) getter/setter can be removed as a whole by deleting the accessor property;
- *) default values of attributes are 'false' when the property is set by defineProperty, whereas 'true' when set in the traditional form;
- *) when modify an spicific attribute, others stay untouched; 
- *) non-configurable property can change its writable from true to false;
- *) non-configurable property can't be deleted; 
- *) non-writable but configurable property can change value by defineProperty;
- *) setter/getter is controlled by 'configurable';
- *) setter/getter can be changed only by defineProperty;
- *) 'writable' only controls data property, incurs error if coexist with getter/setter when define;
- *) 'value' can be a method;
+- accessor property:
+ * getter/setter can be removed as a whole by deleting the accessor property;
+ * default values of attributes are 'false' when the property is set by defineProperty, whereas 'true' when set in the traditional form;
+ * when modify an spicific attribute, others stay untouched; 
+ * non-configurable property can change its writable from true to false;
+ * non-configurable property can't be deleted; 
+ * non-writable but configurable property can change value by defineProperty;
+ * setter/getter is controlled by 'configurable';
+ * setter/getter can be changed only by defineProperty;
+ * 'writable' only controls data property, incurs error if coexist with getter/setter when define;
+ * 'value' can be a method;
 
-@) extensibility(three functions are one way operation/can't be reversed back):
- *) of nonextensible object, its prototype can have new property;
- *) nonextensible object can delete its property, but can't add back;
- *) preventExtensibility()	-> extensible
- *) seal()	-> extensible + configurable
- *) freeze()	-> extensible + configurable + writable (setter is not affected)
+- extensibility(three functions are one way operation/can't be reversed back):
+ * of nonextensible object, its prototype can have new property;
+ * nonextensible object can delete its property, but can't add back;
+ * preventExtensibility()	-> extensible
+ * seal()	-> extensible + configurable
+ * freeze()	-> extensible + configurable + writable (setter is not affected)
 
 
-@) strict mode:
+- strict mode:
 [characteristics]:
- *) prevent dynamic scoping
- *) less error prone;
- *) as a string of 'directive', which should be placed in the beginning of 'script'/'function' with other directives if any;
+ * prevent dynamic scoping
+ * less error prone;
+ * as a string of 'directive', which should be placed in the beginning of 'script'/'function' with other directives if any;
  	function(){
 		var a=1;
 		'use strict' //ignored;
 	}
 [rules]:
- *) 'eval'/'arguments' are keywords, not writable;
+ * 'eval'/'arguments' are keywords, not writable;
 
- *) no 'with';
- *) 'eval' runs in a new scope;
- *) 'delete' non-member name throws error, instead of ignoring;
- *) non-declared variable illicit error, instead of adding to global;
- *) property attributes violation throws error, instead of ignored;
+ * no 'with';
+ * 'eval' runs in a new scope;
+ * 'delete' non-member name throws error, instead of ignoring;
+ * non-declared variable illicit error, instead of adding to global;
+ * property attributes violation throws error, instead of ignored;
 
- *) 'this' in function(not method) is undefined, instead of global;
+ * 'this' in function(not method) is undefined, instead of global;
  	var hasStrictMode = (function() { "use strict"; return this===undefined}());
- *) host passed to 'call'/'apply' stay as what it is, instead of being converted(null/undefined -> global; non-object -> object);
- *) 'caller'/'callee' is inaccessible;
- *) 'arguments' is a copy instead of an alias;
- *) parameters can't has duplicate names, instead of accessing the first one via 'arguments';
+ * host passed to 'call'/'apply' stay as what it is, instead of being converted(null/undefined -> global; non-object -> object);
+ * 'caller'/'callee' is inaccessible;
+ * 'arguments' is a copy instead of an alias;
+ * parameters can't has duplicate names, instead of accessing the first one via 'arguments';
 
- *) json can't has duplicate names, instead of overwritten(*** removed in ES6);
- *) octal literal(leading zero of decimal) throws error;
+ * json can't has duplicate names, instead of overwritten(*** removed in ES6);
+ * octal literal(leading zero of decimal) throws error;
 
 
-@) console.log supports formatting as printf;
+- console.log supports formatting as printf;
 
-@) check window.JSON instead of JSON in IE.
+- check window.JSON instead of JSON in IE.
 
 trace = function (a, c) {
     if ($("#TRACEWINDOW").length == 0) {
@@ -669,95 +662,95 @@ trace = function (a, c) {
 
 
 
-@)event coordinates:
+-event coordinates:
 *) pageX/Y gives the coordinates relative to the <html> element in CSS pixels.
 *) clientX/Y gives the coordinates relative to the viewport in CSS pixels.
 *) screenX/Y gives the coordinates relative to the screen in device pixels.
 
-@) im media query, width stands for the viewport's, divice-width stands for
+- im media query, width stands for the viewport's, divice-width stands for
 screen's, which is hardly used on desktop.
 
-@) two viewports:
+- two viewports:
 *) layout viewport: a large picture;
 *) visual viewport: a small frame through which we look the picture. when zoom
 in, it's taken closer to the picture, vice versa it's zoomed out.
 
-@) although document.documentElement stands for html tag, its
+- although document.documentElement stands for html tag, its
 clientWidth/height stands for the viewport's(layout), not of its own, which can be
 gotten from offsetWidth.
 
-@)visual viewport's dimension can be gotten from window.innerWidth/height.
+-visual viewport's dimension can be gotten from window.innerWidth/height.
 
-@) layout viewport dimension is arbitary varing between different browsers:
+- layout viewport dimension is arbitary varing between different browsers:
 Safari iPhone uses 980px, Opera 850px, Android WebKit 800px, and IE 974px.
 
-@)scale= ideal viewport width / visual viewport width
+-scale= ideal viewport width / visual viewport width
 
-@) in meta tag 'viewport' to controll viewports:
+- in meta tag 'viewport' to controll viewports:
 width - layout viewport
 initial-scale - visual viewport
 *) if layout is less than visual, it's extended; because visual can't be larger than layout.
 
-@) XMLHttpRequest doesn't support 'CONNECT, TRACE, and TRACK';
+- XMLHttpRequest doesn't support 'CONNECT, TRACE, and TRACK';
 
 
-@) web component
- *) get owning document when being imported: document.currentScript.ownerDocument;
+- web component
+ * get owning document when being imported: document.currentScript.ownerDocument;
 
-@) angular2
- *) ChangeDetectionStrategy.OnPush: detect only when input properties change(immutable is not used);
+- angular2
+ * ChangeDetectionStrategy.OnPush: detect only when input properties change(immutable is not used);
 
-@) jsx:
- *) wrap doms in parens;
+- jsx:
+ * wrap doms in parens;
 
-@) react:
- *) it's drived by `setState`.
- *) functional component (function) is called every time in render.
- *) component created as function(no instance / 'this') or class;
- *) component and dom tag are distinguished by first letter case(Upper/lower);
+- react:
+ * it's drived by `setState`.
+ * functional component (function) is called every time in render.
+ * component created as function(no instance / 'this') or class;
+ * component and dom tag are distinguished by first letter case(Upper/lower);
  	.) when lower case is recongized as native DOM node, only supported properties is allowed;
- *) component returns a single root element;
- *) component is functional: parameters won't be modified; same params with same returns;
- *) props: params(immutable);
- *) state only available to component defined by class;
- *) state: variables(mutable), used in render() for model tracking by 'setState()';
- *) setState is async, read 'state' when calling it may get a staled value(other setState is cached); instead pass function to setState: (prevState, props)=>({});
+ * component returns a single root element;
+ * component is functional: parameters won't be modified; same params with same returns;
+ * props: params(immutable);
+ * state only available to component defined by class;
+ * state: variables(mutable), used in render() for model tracking by 'setState()';
+ * setState is async, read 'state' when calling it may get a staled value(other setState is cached); instead pass function to setState: (prevState, props)=>({});
     * get mutated state in componentWillUpdate;
- *) setState triggers render(), if shouldComponentUpdate() returns true(always by default);
- *) setState accept json, which is mixined to previous one, the ones being not overridden are not touched;
- *) PureComponent apply shadow comparison in shouldComponentUpdate(); pass new object when property changed;
- *) parent re-render will trigger descendents re-render;
- *) 6 lifecycle events: componentWillMount/componentWillReceiveProps/(shouldComponentUpdate)/componentWillUpdate/componentDidUpdate/componentDidMount/componentWillUnmount/;
+ * setState triggers render(), if shouldComponentUpdate() returns true(always by default);
+ * setState accept json, which is mixined to previous one, the ones being not overridden are not touched;
+ * PureComponent apply shadow comparison in shouldComponentUpdate(); pass new object when property changed;
+ * parent re-render will trigger descendents re-render;
+ * 6 lifecycle events: componentWillMount/componentWillReceiveProps/(shouldComponentUpdate)/componentWillUpdate/componentDidUpdate/componentDidMount/componentWillUnmount/;
  	.) componentWillReceiveProps
 		..) props may be the same(parent rerender);
 		..) not triggered in mounting;
   .) componentWillUpdate
     ..) can not call setState.
- *) preventDefault instead of 'return false';
- *) prop.children represents passed html;
- *) fetch for ajax;
- *) model in template: {}
- *) <button onClick={this.handleClick}>:	not-bound to 'this' by default(arrow function to overcome);
- *) list of elements with same type should have a 'key' attribute with unique value for comparison efficiency;
- *) event object is reused: it's refreshed after this event loop; cause event.persist() to remove it from pooling;
- *) <a href={this.state.url} >a</a>:	no '' in attributes; valid in text;
- *) 'class' -> 'className'
- *) 'for' -> 'htmlFor'
- *) <span dangerouslySetInnerHTML={{__html:'abc'}}></span>: {__html:'abc'} to set innerHTML;
- *) <span style={{color:'red'}}></span>: style accepts json only;
- *)  <button {...attrs}>MyLabel</button>: compose attributes;
- *) use '&&'/'||'/'?:' for conditional rendering;
- *) controled form field bind its value to state(textarea/select both has a 'value' prop for binding); uncontroled passes itself to code for value manipulating;
+ * preventDefault instead of 'return false';
+ * prop.children represents passed html;
+ * fetch for ajax;
+ * model in template: {}
+ * <button onClick={this.handleClick}>:	not-bound to 'this' by default(arrow function to overcome);
+ * list of elements with same type should have a 'key' attribute with unique value for comparison efficiency;
+ * event object is reused: it's refreshed after this event loop; cause event.persist() to remove it from pooling;
+ * <a href={this.state.url} >a</a>:	no '' in attributes; valid in text;
+ * 'class' -> 'className'
+ * 'for' -> 'htmlFor'
+ * <span dangerouslySetInnerHTML={{__html:'abc'}}></span>: {__html:'abc'} to set innerHTML;
+ * <span style={{color:'red'}}></span>: style accepts json only;
+ *  <button {...attrs}>MyLabel</button>: compose attributes;
+ * use '&&'/'||'/'?:' for conditional rendering;
+ * controled form field bind its value to state(textarea/select both has a 'value' prop for binding); uncontroled passes itself to code for value manipulating;
 	<input type="text" ref={input => this._name = input} />
- *) pass dom ref upwards: pass ref callback down;
- *) mixin problem:
+ * pass dom ref upwards: pass ref callback down;
+ * mixin problem:
  	.) mutated, can't reuse;
 	.) name clash;
 	.) 
- *) ways for data flow:
+ * ways for data flow:
  	.) component hierachy;
 	.) container component
- *) react-router:
+ * react-router:
   .) hashRouter will not match publicPath
   .) router listen to history, then update `match`
  	.) when component doesn't update when url changes, pass location as prop to it(which will change to cause re-render); 
@@ -770,20 +763,20 @@ initial-scale - visual viewport
 	.) react-router-dom for browser; react-router-native for server; react-router-server for server; react-router is fundametal; 
   .) Redirect should not be rendered if not matched, or it will update and cause error 'You tried to redirect to the same route you're currently on', so always place it in Switch.
   .) if path is empty, a slash is passed.
- *) context:
+ * context:
  	.) childContextTypes and contextTypes are necessary;
  	.) provider: childContextTypes & getChildrenContext
   .) consumer (any descendants): contextTypes (if none, context is empty)
 	?) can be relayed;
- *) HOC(higher-order-comp)/composition: wrap a component in another, usually renders the same one with special props;
- *) ReactDOM.render() will check if rendered HTML exists already, and match them if so;
- *) custom DOM attribute added in 'data-*' is reserved;
- *) 'key' attr is reserved, always 'undefined';
- *) change root element's property: call again ReactDOM.render;
- *) <Com /> returns ReactElement(whose $$typeof is a Symbol of key 'react.element') by React.createElement(), which is a virtual DOM describing React Component(type==function)/DOM element(type==string);
- *) setState cause rerender even values are not changed.
- *) devServer publicPath has to ends with slash
- *) cloneElement to assign extra props or replace children.
+ * HOC(higher-order-comp)/composition: wrap a component in another, usually renders the same one with special props;
+ * ReactDOM.render() will check if rendered HTML exists already, and match them if so;
+ * custom DOM attribute added in 'data-*' is reserved;
+ * 'key' attr is reserved, always 'undefined';
+ * change root element's property: call again ReactDOM.render;
+ * <Com /> returns ReactElement(whose $$typeof is a Symbol of key 'react.element') by React.createElement(), which is a virtual DOM describing React Component(type==function)/DOM element(type==string);
+ * setState cause rerender even values are not changed.
+ * devServer publicPath has to ends with slash
+ * cloneElement to assign extra props or replace children.
 
 * mutate children without key is bad practice, or set deleted element to null to maintain correct children mapping.
   **fiber is reused only when key and type are both matched**
@@ -1104,7 +1097,7 @@ in baching updates && not in unbatching updates ?
   <Comp ref={refComp} />
 ```
 
-@) requestAnimationFrame
+- requestAnimationFrame
 
 - runs in the same rate with display device refresh rate
 
@@ -1112,11 +1105,11 @@ in baching updates && not in unbatching updates ?
 
 - the argument which callback receives is timestamp when this repaint starts. The same value is passed to all callbacks.
 
-@) requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
+- requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
 
-@) performance.now() returns DOMHighResTimeStamp (monotonically increasing and sub-milisecond), which is duration from `time origin`
+- performance.now() returns DOMHighResTimeStamp (monotonically increasing and sub-milisecond), which is duration from `time origin`
 
-@) time origin:
+- time origin:
  
 - browser context is created
 
@@ -1124,22 +1117,22 @@ in baching updates && not in unbatching updates ?
 
 - webworker is created.
 
-@) redux:
+- redux:
 https://tonyhb.gitbooks.io/redux-without-profanity
- *) read: getState, write: dispatch, watch: subscribe;
- *) data/store is defined initially with each property with value of type of function(reducer), each is called in 'dispatch' to get the actual value;
+ * read: getState, write: dispatch, watch: subscribe;
+ * data/store is defined initially with each property with value of type of function(reducer), each is called in 'dispatch' to get the actual value;
  	xxxxxxxxxxxxx) init value returns when no actions; 
  	.) single global store;
  	.) reducer structure is corresponding to that of store(each returns a part of the store); 
- *) container is wrapper component which passes state field as property to component;
- *) action is a data structure passed to reducer to initiate an action to store;
- *) middleware intercepts action when passed to reducer;
- *) enhancer is to enhance `createStore`, which accepts `createStore` and whatever arguments createStore accepts. Then how to create store is totally delievered to the enhancer.
- *) middleware is nested functions
+ * container is wrapper component which passes state field as property to component;
+ * action is a data structure passed to reducer to initiate an action to store;
+ * middleware intercepts action when passed to reducer;
+ * enhancer is to enhance `createStore`, which accepts `createStore` and whatever arguments createStore accepts. Then how to create store is totally delievered to the enhancer.
+ * middleware is nested functions
     1. receive store
     2. receive next middleware (the last middleware receives dispatch: compose(middlewares)(store.dispatch))
     3. reducer handler
- *) reducer:
+ * reducer:
  	.) contain biz logic;
 	.) normalize/flatten the shape(reference structure by id), even nested is applicable(combineReducers({fieldA:combineReducers({fieldA_A, fieldA_B})}));
 		..) array of structure => array_of_id + id_struct_object;
@@ -1151,34 +1144,34 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 		..) immutable.js, object-path-immutable(support batch)
 	.) time-traveling requires functional/pure/predictable: don't touch anything outside; no unique/random data generated(pass in instead);
 	.) combineReducers limit the state type(plain object), parameters passed(sliced state + action), and other things;
- *) react-redux: Provider(store->react), connect((sliced state)/(store methods) -> comp);
+ * react-redux: Provider(store->react), connect((sliced state)/(store methods) -> comp);
  	.) mapStateToProps(state, [origProps]): state(select from the whole) <- subscribe; origProps <- componentWillReceiveProps(shallow compare);
 	.) mapDispatchToProps(embed store methods into args or action sender function, and pass in as props; execute right away)
 		..) mapDispatchToProps(dispatch, [ownProps]):{actionCreator(args){}}: only 'dispatch'; helper redux.bindActionCreators()
 		xxx..) {actionCreator(args)=>((dispath, getState)=>{})}: 'dispatch' and 'getState';
 	.) some array/immutable functions (reduce, map...) always return new object, deep compare before return (lodash.isEqual);
- *) reduce-reducers.js: the whole state is passed to all reducers (instead of pass corresponding slice as combineReducer);
- *) redux-immutable.js: make redux recongize its store as an Immutable.Collection;
- *) Immutable.js
+ * reduce-reducers.js: the whole state is passed to all reducers (instead of pass corresponding slice as combineReducer);
+ * redux-immutable.js: make redux recongize its store as an Immutable.Collection;
+ * Immutable.js
 	.) toJs(): always returns new object(expensive);
 	.) don't mix with plain object; 
 	.) never in components;
- *) redux-act/redux-actions: actionCreator generator to ensure actions adhering to standard (such as FSA: Flux Standard Action); 	
- *) redux-thunk: when aync and sync action creators are mixed, it's hard to remember which one is async and pass 'dispatch' to it;
+ * redux-act/redux-actions: actionCreator generator to ensure actions adhering to standard (such as FSA: Flux Standard Action); 	
+ * redux-thunk: when aync and sync action creators are mixed, it's hard to remember which one is async and pass 'dispatch' to it;
 	 .) when action dispatched is a function, execute it, and returns its result; other middlewares are ignored;
- *)  Redux Saga or Redux Loop
- *) state depends on another:
+ *  Redux Saga or Redux Loop
+ * state depends on another:
  	 .) pass in action
 	 .) combine as a single
 	 .) whole state as a single (the last root reducer): reduceReducers(combineReducers(...), (rootState, action)=>{})
 	 .) remove from store, calc in container, but with memoization (reselect); 
 
- *) reselect
+ * reselect
  	.) reuse between different instances of container can memoize, if 'props' is passed, since 'props' are different;
 	.) if some arguments always are new even data is not modified, replace equalityCheck(defaultMemoize) with deep compare, **if efficient** 
 
 
-  *) compose(fun1, fun2, ...): args to the last, then result to the left, left, ...
+  * compose(fun1, fun2, ...): args to the last, then result to the left, left, ...
 
   return funcs.reduce(function (a, b) {
     return function () {
@@ -1194,27 +1187,27 @@ https://tonyhb.gitbooks.io/redux-without-profanity
     })(d.apply(undefined, arguments));
 -----------
 
-@) fetch(https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch);
- *) cors(default): dictate browser whether to send, check access control header from server;
- *) no-cors: access control header is not required, but methods, headers and response properties are restricted, and error message is opaque if server rejected;
- *) stream: response.body - ReadableStream
- *) cache
- *) include cookie: credentials:'include'
- *) http error status is not rejected; 
- *) redirect is not accessible in case private data is contained in target url.
+- fetch(https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch);
+ * cors(default): dictate browser, whether to send, check access control header from server;
+ * no-cors: access control header is not required, but methods, headers and response properties are restricted, and error message is opaque if server rejected;
+ * stream: response.body - ReadableStream
+ * cache
+ * include cookie: credentials:'include'
+ * http error status is not rejected; 
+ * redirect is not accessible in case private data is contained in target url.
 
-@) reponse type
+- reponse type
 - error: 
 
   if csp is violated, this type is returned.
 
-@) Access-Control-Expose-Headers
+- Access-Control-Expose-Headers
 
-@) observable stream supply values and call handlers multiple times, whereas promise only once; 
- *) promise:
+- observable stream supply values and call handlers multiple times, whereas promise only once; 
+ * promise:
 	.) returns a single value
 	.) not cancellable
- *) observable
+ * observable
 	.) works with multiple values over time
 	.) cancellable
 	.) supports map, filter, reduce and similar operators
@@ -1222,39 +1215,39 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 	.) use Reactive Extensions (RxJS)
 	.) an array whose items arrive asynchronously over time
 
-@) immutable.js (Persistent data structures; structural sharing)
- *) access fields via array: {fieldA:{fieldB:{fieldC:1}}}	-> ['fieldA','fieldB','fieldC']
- *) employ 'Seq' or 'withMutations' to apply batch mutation to emit once;
+- immutable.js (Persistent data structures; structural sharing)
+ * access fields via array: {fieldA:{fieldB:{fieldC:1}}}	-> ['fieldA','fieldB','fieldC']
+ * employ 'Seq' or 'withMutations' to apply batch mutation to emit once;
 
-@) response can be read only once, so clone it before read for later use:
+- response can be read only once, so clone it before read for later use:
 	cache.put(key, response.clone());
 
-@) File of input file is of type Blob;
+- File of input file is of type Blob;
 
-@) add polyfill as webpack entry as shortcut;
+- add polyfill as webpack entry as shortcut;
 
-@) tools:
- *) watch(to execute cmd): https://github.com/mikeal/watch
+- tools:
+ * watch(to execute cmd): https://github.com/mikeal/watch
 
 
-@) access 'data-*':
- *) dataset[*]
- *) getAttribute('data-*')
+- access `data-*`:
+ * `dataset[*]`
+ * `getAttribute('data-*')`
 
-@) 'switch' adopt '===';
+- 'switch' adopt '===';
 
-@) arguments validation in caller or callee;
+- arguments validation in caller or callee;
 
-@) when convert to number implicitly, 'valueOf' is called;
+- when convert to number implicitly, 'valueOf' is called;
 
 	let n={valueOf:()=>1};
 	n+1	=> 2;
 
-@) touchmove-preventDefault() to overcome that 'pointermove' is 'pointercancel'ed;	
+- touchmove-preventDefault() to overcome that 'pointermove' is 'pointercancel'ed;	
 
-@) regexp, backreference, match whole matched string;
+- regexp, backreference, match whole matched string;
 
-@) download file via ajax:
+- download file via ajax:
 let xhr=new XMLHttpRequest();
 xhr.open('GET', '/tshark.pdf');
 xhr.responseType='arraybuffer';
@@ -1269,6 +1262,7 @@ xhr.onload=function(){
 }
 xhr.send();
 
-@) instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
+- instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
 
-@) ToInt32: adopts `floor`
+- ToInt32: adopts `floor`
+

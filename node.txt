@@ -267,7 +267,9 @@ general
 
 @) `node debug` may work more stably than `node inspect` in some version or some api, or vice versa.
 
-@) pass debug argument before exec file when debug child process;
+### child process;
+* pass debug argument to child process
+* if child cannot be paused, combine console and chrome (inspect & debug)
 
 
 @) when run in debug mode, don't redirect output like this:
@@ -370,3 +372,5 @@ function(args, cb) {
 @) execute install script only when in standalone, e.g. not as dependency
 
   "postinstall": "node -e \"JSON.parse(process.env['npm_config_argv']).remain[0] && process.exit(1)\" && installflow || echo"
+
+@) 'find-cache-dir' stores cache in 'node_modules/.cache'
