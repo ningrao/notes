@@ -33,6 +33,7 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
  *) local node_modules takes precedence;
  *) local command resides in 'node_modules/.bin/';
  *) then os command;
+ **`cwd` is set to package root**
 
 @) module for os command:
  *) rimraf: rm
@@ -155,11 +156,11 @@ general
  *)	when load a directory, it checks:
 	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
  *) require('pkg')	-> installed package 
- * find in paths in 'module.paths'
+ * find in paths in 'global.module.paths'
 
 	require('./file')	-> local file
 
- *) require.main: the entry module;
+ *) `require.main.filename`: the entry module;
  *) require.main.require('util/do'): starts from app root;
  *) 'json' file should has extension or it's treated as js file; or read it manually with `file` api; 
  *) '.js' extension is omited only in relative path;
@@ -267,6 +268,8 @@ general
 
 @) `node debug` may work more stably than `node inspect` in some version or some api, or vice versa.
 
+@) if upper variables of closure are not refered in this scope, it can not be read in debugger.
+
 ### child process;
 * pass debug argument to child process
 * if child cannot be paused, combine console and chrome (inspect & debug)
@@ -317,6 +320,7 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 
 @) child_process: spawn
   *) fork: nodejs process (comand line arguments are inherited - process.execArgv, such as debug)
+    - inject debug arg: process.execArgv.unshift('--inspect-brk')
 	*) exec: subshell
 	*) execFile: process
   *) interaction:
@@ -374,3 +378,5 @@ function(args, cb) {
   "postinstall": "node -e \"JSON.parse(process.env['npm_config_argv']).remain[0] && process.exit(1)\" && installflow || echo"
 
 @) 'find-cache-dir' stores cache in 'node_modules/.cache'
+
+# setTimeout holds event loop open by default (timer.ref() was called, to turn off, call timer.unref()).

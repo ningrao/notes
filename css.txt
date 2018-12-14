@@ -39,6 +39,8 @@ inline	->	id	->	attr & class	-> element & pseudo element
 @) break(page/column/region): break-inside/before/after
 
 @) css module no syntax for multi-rules in curly braces (:global{}); ':global' has to be prepended to each rule;
+  - mix scopes in the same rule:
+  `.select:global(.Select--single > .Select-control .Select-value) {}`
 	 
 
 @) shorthand properties set all sub-properties, missing values are set to 'initial';
@@ -119,7 +121,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
  *) absolutely positioned child doesn't participate in the flex layout;
  *) percentage in padding/margin on item is not consistent across browsers;
  *) flex-basis: initial width before fill is applied, take precedence over 'width/height';
- *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space appor shrinked space;
+ *) flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space or shrinked space;
  *) flex-wrap:wrap; grow/shrink no need to exist;
  *) if no flex-grow/shrink is specified, fill based on the propotion of their basis;
 
@@ -223,3 +225,18 @@ inline	->	id	->	attr & class	-> element & pseudo element
     * scale [visual-width/device-width]: control visual viewport, e.g. content pixels displayed in window.
 
 @) requestAnimationFrame may not trigger 'trainsition';
+
+@) number input spinner:
+
+@) less
+
+- group tokens together in mixin params: ~''
+
+  `.abc(~'div .cls')`
+
+- param in selector should interpolate
+
+```
+@{param}: {}
+```
+@) `<link href='blob:...'` is not blocking.

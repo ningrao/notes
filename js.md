@@ -11,10 +11,12 @@ can route with plain link?
 
  * regex
  	`(?:.*)` - non-capturing
- 	`.*?=` - lookahead positive
- 	`.*?!` - lookahead negative
- 	`?<=.*` - lookbehind positive
- 	`?<!.*` - lookbehind negative
+ 	`.*?=A` - lookahead positive
+ 	`.*?!A` - lookahead negative
+ 	`?<=A.*` - lookbehind positive
+ 	`?<!A.*` - lookbehind negative
+
+  [1^23] - `^` is ignored, it can appear only at start to indicate each char in this group.
 
  * stages:
 stage-0 - Strawman: just an idea, possible Babel plugin.
@@ -235,9 +237,9 @@ let node = {
 	range: [0, 1, 2, 3, 4]
 };
 let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums], nonexist:{fd}={}} = node;
-				|						|				|			|							|
-				default value;			|				omit;		|							default value(if none, error occurs)
-										new name;					rest all elements;
+                  |						          |				        |			            |							        |
+          default value;			          |				      omit;		            |							  default value(if none, error occurs)
+                                    new name;					              rest all elements;
 
  * initializer is mandatory:
  	let {var1, var2};		--error since no value assigned;
@@ -436,6 +438,8 @@ run(tasks).then(function(rs){
 - scope is not global, then 'this' is undefined;
 
 - import/export should resides at the outmost level, determinable by compiler; 
+
+- import commonjs module: `import * as name from ...`
 
 - export:
  * when declare:
@@ -704,6 +708,7 @@ initial-scale - visual viewport
  * wrap doms in parens;
 
 - react:
+ * set value of input to null/undefined, equal to remove value property, thus it turns to uncontrolled.
  * it's drived by `setState`.
  * functional component (function) is called every time in render.
  * component created as function(no instance / 'this') or class;
@@ -1004,6 +1009,8 @@ in baching updates && not in unbatching updates ?
 
 ### Tips
 
+- Even shouldUpdate returns false and 'render' is not called, children are still checked for update.
+
 - React defines abstract API leaving for other renderer to implement, such as Component.updater.
 
 - expirationTime is 1000+200ms.
@@ -1265,4 +1272,12 @@ xhr.send();
 - instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
 
 - ToInt32: adopts `floor`
+
+- stopImmediatePropagation, stop firing other handlers even on the same nodes (IE9+)
+
+## regexp
+
+- single line mode
+  not supported. work around: `[\s\S]` instead of `.`.
+
 
