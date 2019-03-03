@@ -25,6 +25,10 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
  *) win: %appdata%\npm\node_modules
  *) linux: /usr/lib/node_modules
 
+@) 'npm no such file or directory, ... .staging ...' 
+
+remove package-lock.json
+
 @) npm install will remove those not included in pakcage.json;
 
 @) run arbitrary script in 'scripts' of 'package.json'
@@ -79,9 +83,11 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
  *) installed in current directory as 'npm i'(except specify --production or 'NODE_ENV' of value 'production');
  *) won't install in package as 'npm i pkg'(except specify --development or 'NODE_ENV' of value 'development');
 
-@) 'peerDependencies' won't install in version not earllier than 3.0;
+@) 'peerDependencies' won't be installed with version not earlier than 3.0;
  *) used for a plugin, specifies which version of host this works for;
  *) if warning appears, things must be that the installed host doesn't match with this plugin, or no host is installed yet;
+
+@) 'peerDependencies' should be duplicated in 'devDependencies' if testing is wanted.
 
 @) list installed dependencies:
 npm list [-g] pkg

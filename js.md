@@ -634,7 +634,7 @@ Reflect.ownKeys()	--string+symbol
  * 'arguments' is a copy instead of an alias;
  * parameters can't has duplicate names, instead of accessing the first one via 'arguments';
 
- * json can't has duplicate names, instead of overwritten(*** removed in ES6);
+ * json can't has duplicate names, instead of overwritten(*** removed in ES6 ***);
  * octal literal(leading zero of decimal) throws error;
 
 
@@ -642,6 +642,7 @@ Reflect.ownKeys()	--string+symbol
 
 - check window.JSON instead of JSON in IE.
 
+```
 trace = function (a, c) {
     if ($("#TRACEWINDOW").length == 0) {
         $("<div id='TRACEWINDOW' style='position:absolute;border:1px black solid;background:#eee;color:Black;left:0;bottom:0;font-size:30px;z-index:9999999'><div id='traceWin_msg' style='padding:3px;'></div><div style='background:black;clear:both;'><input type='text'  id='traceWin_cmd' value='' style='width:300px'/><input type='button'  id='traceWin_btn' value='execute'></div></div>").appendTo("body");
@@ -663,6 +664,7 @@ trace = function (a, c) {
     if (c) a = $("#traceWin_msg").text() + "|" + a;
     $("#traceWin_msg").text(a)
 };
+```
 
 
 
@@ -707,7 +709,10 @@ initial-scale - visual viewport
 - jsx:
  * wrap doms in parens;
 
-- react:
+## React 
+
+### Usage
+ * HMR updated Component has a diffenrent type, so the old one will be deleted/unmount.
  * set value of input to null/undefined, equal to remove value property, thus it turns to uncontrolled.
  * it's drived by `setState`.
  * functional component (function) is called every time in render.
@@ -741,9 +746,9 @@ initial-scale - visual viewport
  * <a href={this.state.url} >a</a>:	no '' in attributes; valid in text;
  * 'class' -> 'className'
  * 'for' -> 'htmlFor'
- * <span dangerouslySetInnerHTML={{__html:'abc'}}></span>: {__html:'abc'} to set innerHTML;
+ * `<span dangerouslySetInnerHTML={{__html:'abc'}}></span>`: `{__html:'abc'}` to set innerHTML;
  * <span style={{color:'red'}}></span>: style accepts json only;
- *  <button {...attrs}>MyLabel</button>: compose attributes;
+ * <button {...attrs}>MyLabel</button>: compose attributes;
  * use '&&'/'||'/'?:' for conditional rendering;
  * controled form field bind its value to state(textarea/select both has a 'value' prop for binding); uncontroled passes itself to code for value manipulating;
 	<input type="text" ref={input => this._name = input} />
@@ -775,7 +780,7 @@ initial-scale - visual viewport
 	?) can be relayed;
  * HOC(higher-order-comp)/composition: wrap a component in another, usually renders the same one with special props;
  * ReactDOM.render() will check if rendered HTML exists already, and match them if so;
- * custom DOM attribute added in 'data-*' is reserved;
+ * custom DOM attribute added in `data-*` is reserved;
  * 'key' attr is reserved, always 'undefined';
  * change root element's property: call again ReactDOM.render;
  * <Com /> returns ReactElement(whose $$typeof is a Symbol of key 'react.element') by React.createElement(), which is a virtual DOM describing React Component(type==function)/DOM element(type==string);
@@ -1104,13 +1109,13 @@ in baching updates && not in unbatching updates ?
   <Comp ref={refComp} />
 ```
 
-- requestAnimationFrame
+## requestAnimationFrame
 
-- runs in the same rate with display device refresh rate
+  - runs in the same rate with display device refresh rate
 
-- will pause when invisible
+  - will pause when invisible
 
-- the argument which callback receives is timestamp when this repaint starts. The same value is passed to all callbacks.
+  - the argument which callback receives is timestamp when this repaint starts. The same value is passed to all callbacks.
 
 - requestIdleCallback accepts timeout to ensure callback is invoked before the deadline.
 
@@ -1124,7 +1129,7 @@ in baching updates && not in unbatching updates ?
 
 - webworker is created.
 
-- redux:
+## redux:
 https://tonyhb.gitbooks.io/redux-without-profanity
  * read: getState, write: dispatch, watch: subscribe;
  * data/store is defined initially with each property with value of type of function(reducer), each is called in 'dispatch' to get the actual value;
@@ -1203,7 +1208,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  * http error status is not rejected; 
  * redirect is not accessible in case private data is contained in target url.
 
-- reponse type
+- response type
 - error: 
 
   if csp is violated, this type is returned.
