@@ -9,14 +9,19 @@ can route with plain link?
 
  * when a new version is issued, the old one is withdrawn automatically;
 
- * regex
- 	`(?:.*)` - non-capturing
- 	`.*?=A` - lookahead positive
- 	`.*?!A` - lookahead negative
- 	`?<=A.*` - lookbehind positive
- 	`?<!A.*` - lookbehind negative
+## regex
 
-  [1^23] - `^` is ignored, it can appear only at start to indicate each char in this group.
+|------------|----------|----------|
+|            | positive | negative |
+|------------|----------|----------|
+| lookahead  | `.*?=A`  | `.*?!A`  |
+|------------|----------|----------|
+| lookbehind | `?<=A.*` | `?<!A.*` |
+|------------|----------|----------|
+
+-	`(?:.*)` - non-capturing
+
+- `[1^23]` - `^` is ignored, it can appear only at start to indicate each char in this group.
 
  * stages:
 stage-0 - Strawman: just an idea, possible Babel plugin.
