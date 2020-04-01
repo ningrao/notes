@@ -18,7 +18,7 @@ W3C spec
  - Informative: examples and explanations;
  
 =====================================================
-@) OWASP: Open Web App Security Project
+## OWASP: Open Web App Security Project
 https://www.owasp.org
 
 ### optimization
@@ -44,29 +44,29 @@ https://www.owasp.org
 
 - postload assets unrelated for initial rendering.
 
-@) HOL(Head of Line) blocking: in FIFO sequence processing, the first in the task line blocks those after it;
+## HOL(Head of Line) blocking: in FIFO sequence processing, the first in the task line blocks those after it;
  - input buffered network switches; 
  - out-of-order delivery;
 
-@) test pyramid: ratio of amount of tests between the three types(from top to bottom):
+## test pyramid: ratio of amount of tests between the three types(from top to bottom):
 	end-to-end	->	intergration	-> unit
 
-@) header Strict-Transport-Security: https only
+## header Strict-Transport-Security: https only
 
-@) header Content-Security-Policy: specify valid resources uri;
+## header Content-Security-Policy: specify valid resources uri;
 
 `Content-Security-Policy: frame-src https://example.com/`
 
-@) normalized table:
+## normalized table:
  1st) primary key; atomic value; no repeating columns(value1, value2, value3...);
  2nd) non-key columns depends on primary key;
  3rd) the dependency is non-transitive(doesn't rely on a third column in the middle: personId->weight->isOverweight)
 
-@) higher-order-sth: a function which accepts some 'sth' as parameters and returns a new 'sth'; 
+## higher-order-sth: a function which accepts some 'sth' as parameters and returns a new 'sth'; 
 ------------------------------------------
 architecture & design
 ------------------------------------------
-@) angular1(framework)
+## angular1(framework)
  - html-centric;
  - two-way data-binding;
  - dependency injecting;
@@ -94,7 +94,7 @@ architecture & design
 
 ## injector.invoke() parse arguments (injectionArgs) and retrieve them (getService) from cache and pass to invoked functin.
 
-@) angular2(framework)
+## angular2(framework)
  - mobile oriented
  - native support(NativeScript)
  - component driven(substitutes directive&controller); 
@@ -109,7 +109,7 @@ architecture & design
  - data from top to bottom, event bubbles up;
  - server side rendering(Universal Angular 2);
 
-@) react(library for view)
+## react(library for view)
  - js-centric(jsx);
  	.) view is coupled with logic;
 	.) not intuitive;
@@ -131,9 +131,9 @@ architecture & design
 	.) component scoped style in js or manipluate class name;
 	.) virtual-dom is memory consuming;
 
-@) react native(react for mobile)
+## react native(react for mobile)
 
-@) flux(architecture): redux, facebook, reflux, alt...;
+## flux(architecture): redux, facebook, reflux, alt...;
  - unidirectional data flow: view doesn't modify model;
  - bypassing data flowing through components hierarchy, managing states outside the root component;
  action -> dispatcher -> store -> view
@@ -142,7 +142,7 @@ architecture & design
  - cons: 
  	.) hard to scale;
 
-@) vue(library for view)
+## vue(library for view)
  - html-centric;
  - functional components;
  - virtual dom abstraction(snabbdom);
@@ -155,22 +155,25 @@ architecture & design
 
 
 
-@) web component(standard for module):
+## web component(standard for module):
  - custom element life cycle events: connected/disconnected/attributeChanged/adopted;
  - shadow dom
+  + js is not encapsulated
  - html import
+  + css is **not** applied
+  + js is executed
  - template & slot
  - pros:
  	.) native
 	.) open & portable
 	.) encapsulate js/style;
 
-@) polymer(library for web component):
+## polymer(library for web component):
 
-@) polymer Toolbox(archetecture): app-layout + app-route + app-localize-behavior + app-storage + app-localize-behavior
+## polymer Toolbox(archetecture): app-layout + app-route + app-localize-behavior + app-storage + app-localize-behavior
  - features are encapsulated and represented as custom element;
 
-@) ember(framework)
+## ember(framework)
  - full feature;
  - apply handlebar template;	 
  - requires library(jquery) for dom manipulating;
@@ -180,26 +183,26 @@ architecture & design
  	.) opinionated
 	.) heavy
 
-@) backbone(framework)
+## backbone(framework)
  - pros: 
  	.) light
  - cons: 
  	.) no template
 	.) refreshing model&view is achieved manually; 
 
-@) knockout
+## knockout
  - mvvm;
  - observables;
  - cons: 
  	.) no component;
 
-@) underscore(library for utility)
+## underscore(library for utility)
  - template
 	 
 
-@) Progressive Web App(Progressive enhancement, Responsive, Connectivity independent, App-like, Fresh, Safe, Discoverable, Re-engageable, Installable, Linkable)
+## Progressive Web App(Progressive enhancement, Responsive, Connectivity independent, App-like, Fresh, Safe, Discoverable, Re-engageable, Installable, Linkable)
 
-@) isomorphic/universal web app: Client+Server MVC, share codes between client and server;
+## isomorphic/universal web app: Client+Server MVC, share codes between client and server;
  - isomorphic.net;
  - frameworks/library: Meteor, Rendr... 
  - server renders once, then leave for client side;
@@ -210,16 +213,16 @@ architecture & design
 	.) HTML got without browser support;
 	.) build separate codes for client;
 
-@) foundation: equivalent to bootstrap;
+## foundation: equivalent to bootstrap;
 
-@) Cordova is base of PhoneGap(which is adapted by Adobe);
+## Cordova is base of PhoneGap(which is adapted by Adobe);
 
 ------------------------------------------
 tools & tech
 ------------------------------------------
-@) Esprima is a parser/metaprogramming tool for javascript;
+## Esprima is a parser/metaprogramming tool for javascript;
 
-@) PhantomJS is a webkit browser without UI;
+## PhantomJS is a webkit browser without UI;
  - phantom.require can resolve phantom-buitin module, node modules, and absolute path files;
  - overcome ssl error/bugs: --ignore-ssl-errors=true
  - it executes in browser environment with its own modules available.
@@ -232,7 +235,7 @@ tools & tech
     * `this` is an empty object, `global` is window.
  - caches file even from local system (add query to overcome).
 
-@) casperjs
+## casperjs
 
 The cli calls engine with its implementation as entry. So Casper is preloaded in the engine running environment, then it loads the target js file in the running environment.
 
@@ -252,13 +255,13 @@ The cli calls engine with its implementation as entry. So Casper is preloaded in
  - phantom doesn't pick 'global.require' for 'require'.
 
 
-@) weex is a platform for mobile app(web can be converted to native);
+## weex is a platform for mobile app(web can be converted to native);
 
-@) coffeescript is language sugar;
+## coffeescript is language sugar;
 
-@) hyperscript is a tool to create doms in js;
+## hyperscript is a tool to create doms in js;
 
-@) bundler:
+## bundler:
  - webpack(https://webpack.github.io/docs)
 	pros:
 	.) amd & cjs & global;
@@ -276,17 +279,17 @@ The cli calls engine with its implementation as entry. So Casper is preloaded in
 	cons:
 	.) only support commonJS module;
 
-@) bower: download js modules;
+## bower: download js modules;
 
-@) memoization: cache function result for recalling;
+## memoization: cache function result for recalling;
 
-@) ORM is object-relatinal mapping, database tool;
+## ORM is object-relatinal mapping, database tool;
 
-@) protractor: e2e tester for angular, based on selenium and jasmine; 
+## protractor: e2e tester for angular, based on selenium and jasmine; 
 
-@) selenium for e2e; karma for unit;
+## selenium for e2e; karma for unit;
 
-@) grunt-cli(global) is a tool which invoke grunt(local) in current directory;
+## grunt-cli(global) is a tool which invoke grunt(local) in current directory;
  - task is a function defined directly(registerTask/registerMultiTask) or from a plugin();
  - returns false to fail the task;
  - config is queried in json defined in initConfig with the same name;
@@ -308,7 +311,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 });
 > grunt task1:tar1:a1:a2
 
-@) babel
+## babel
  - in '.babelrc', 'env' is merged shallowly.
  - '.babelrc' are merged through hierarchy until package root.
   **if file is in a nested package, the config files are not read**
@@ -337,11 +340,11 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
   - merge '.babelrc' on top of 'babel.config.js'
  
 
-@) json5
+## json5
  - comment
  - no quotes(valid identifier), single quote;
 
-@) tapable stores plugins in `_plugins`
+## tapable stores plugins in `_plugins`
 
 # webpack
  - WebpackOptionsDefaulter.js apply default options. 
@@ -686,26 +689,26 @@ normal <-      normal   <-    normal
                   
 
 
-@) postcss
+## postcss
 
 
 ------------------------------------------
 general
 ------------------------------------------
-@) what changes model:
+## what changes model:
  - event
  - xhr
  - timer
 
-@) immutable object makes diff easier by replace comparing object content with comparing object address;
+## immutable object makes diff easier by replace comparing object content with comparing object address;
  - if a field is changed, a new object is returned;
 
-@) bail: return 'money' as security or will fail.
+## bail: return 'money' as security or will fail.
 
-@) HTML5 differences from HTML4 
+## HTML5 differences from HTML4 
 https://www.w3.org/TR/2010/WD-html5-diff-20101019/#changes-2010-06-24
 
-@) module and dependency:
+## module and dependency:
  - AMD(async): requirejs
 ```
 	define([modB], function(){
@@ -768,55 +771,54 @@ return (function(modules) {
  ...
 ```
 
-@) requirejs circular dependency resolution:
+## requirejs circular dependency resolution:
  - call require() in define(); (although it's empty, it is mandatory to add it in the dependency array as well)
  - apply CommonJS wrapper(no dependency array; access refed module property after this returns);
 
-@) in some browser, reload occurs when back from new pages opened by ways of browser, such as "open" or 'a'.
+## in some browser, reload occurs when back from new pages opened by ways of browser, such as "open" or 'a'.
 
 - transition will not work if that property changed has no initial value;
 
 - setCustomValidity('') can't remove the builtin errors;
 
-@) when position:absolute, margin-top is respective to height in some browser;
+## when position:absolute, margin-top is respective to height in some browser;
 
-@) rt(ruby text), rp(ruby parenthesis)
+## rt(ruby text), rp(ruby parenthesis)
 
-@) append codes to window created by 'window.open()'; 
-@) rotate3d(x,y,z,d):
+## append codes to window created by 'window.open()'; 
+## rotate3d(x,y,z,d):
 (x,y,z) is a point in 3d space, which combines with (0, 0, 0) as a line to define the rotate axis;
 
-@) origin is related to its original location before any tranforming applied;
+## origin is related to its original location before any tranforming applied;
 
-@) if duration between setting start css  and end is too short, transition may have no effect;
+## if duration between setting start css  and end is too short, transition may have no effect;
 
-@) transitionend fires for each property;
+## transitionend fires for each property;
 
-@) to remove inline style, set an invalid value;
+## to remove inline style, set an invalid value;
 
-@) http 1.0 defines authorization header format as:
+## http 1.0 defines authorization header format as:
 Authorization: <type> <credentials>
  - 'Bearer' type belongs to 'OAuth 2.0'; 
 
-@) nginx can handle TLS(Transport layer security);
+## nginx can handle TLS(Transport layer security);
 
-@) SSE: Server Send Event:
+## SSE: Server Send Event:
  - unidirectional
  - better set 'Cache-Control: no-cache';
  - MIME: text/event-stream
 
-@) WebSocket:
+## WebSocket:
  - bidirectional;
- - no Same Origin Policy 
 
-@) WebWorker:
+## WebWorker:
  - 'WorkerGlobalScope' is the counterpart of 'window' in pages;
  - no sync issue, since data passed are copied;
  - importScript(path) to use external script;
  - can't load from other origin, even with CORS header set(module worker is an exception); 
  - alert counterpart is Notification;
 
-@) ServiceWorker(special webworker):
+## ServiceWorker(special webworker):
  - a proxy to intercept requests, scope is:
  	.) pages resides in the same directory(or under) of the worker scirpt file;
 	.) whatever requests those pages triggers(even another origin);
@@ -840,29 +842,29 @@ this.addEventListener('fetch', function(event) {
     }));
 });
 
-@) offline app(superseded by ServiceWorker);
+## offline app(superseded by ServiceWorker);
  - manifest file is a text file of whatever name with '.appcache' extension and 'text/cache-manifest' MIME type;
  - query string distinguishs different file; 
  - when a single file doesn't exist in manifest, the whole file is ignored;
  - no expiration date, except manifest changes;
 
-@) http2/SPDY
+## http2/SPDY
  - multiplex streams: all files in a single connection
   * divided into binary frames sent asyncally.
   * prioritizing
  - server push
  - header compression
 
-@) http/2 dependency tree priority model
+## http/2 dependency tree priority model
  * 
 
-@) idempotant functions: the result is the same when execute more than one times;
+## idempotant functions: the result is the same when execute more than one times;
 
-@) Clickjacking: cover page with an iframe, which hosts a third-party page which accept user inputs(click/type);
+## Clickjacking: cover page with an iframe, which hosts a third-party page which accept user inputs(click/type);
  - top!=window&&(top.location=window.location);
  - X-Frame-Options: Deny/SAMEORIGIN
 
-@) eslint:
+## eslint:
  - dot file is ignored by default;
 	- when linting ignored file error: "eslint file ignored by default use a negative ignore pattern"
  - shared-node-browser: only those common in both; 
@@ -889,51 +891,51 @@ this.addEventListener('fetch', function(event) {
  	.) if 'extends' from an alias
 	.）if has an arrow function method
 
-@) prettier-eslint don't work if eslint plugin is not installed globally.
+## prettier-eslint don't work if eslint plugin is not installed globally.
 
-@) js-beautify
+## js-beautify
  - decode unicode escape sequence: -x
  - modify the orginal file: -r
 
-@) basic Authorization header:
+## basic Authorization header:
 	Authorization: Basic btoa(username:password); 
 	> btoa: base64 encoding;
-@) when config file 'gulpfile.js' converted to 'gulpfile.babel.js', gulp executes after 'babel-register()';
+## when config file 'gulpfile.js' converted to 'gulpfile.babel.js', gulp executes after 'babel-register()';
 
-@) simple request (without preflight):
+## simple request (without preflight):
  - methods: GET, POST, HEAD
  - headers: Accept Accept-Language Content-Language Content-Type (but note the additional requirements below) Last-Event-ID DPR Downlink Save-Data Viewport-Width Width
  - Content-Type: application/x-www-form-urlencoded multipart/form-data text/plain
  - No event listeners are registered on any XMLHttpRequestUpload object used in the request.
  - No ReadableStream object is used in the request.
 
-@) third-party cookie: another domain in iframe/ajax
+## third-party cookie: another domain in iframe/ajax
  - a looser extent than origin: only top domain difference (whatever subdomain/port/protocol is);
  - if 'block third party cookie' is enabled, codes in another domain run in 'third-party' scenario have **no access** to its own cookies;
  - open new window to turn to 1st party to overcome restriction;
 
-@) babel-preset-es2015/env:
+## babel-preset-es2015/env:
  * modules:false to prevent converting es6 modules to commonjs modules for webpack tree-shaking(remove unused `export`ed) working;
  * useBuiltin: insert `import` individual polyfill into scripts based on usage.
     ** webpack harmony-module mark this as es6 module, cause `module.exports` in commonjs module unwrittable and 'exports' renamed to '__webpack_exports__' so don't apply this feature on commonjs module. **
 
-@) 'react-test-renderer' is desined for snapshot test;
+## 'react-test-renderer' is desined for snapshot test;
  * version should match with React; 
 
 	renderer16 & react15:
 
 	`TypeError: Cannot read property 'ReactCurrentOwner' of undefined`
 
-@) source map may cause debugging problem;
+## source map may cause debugging problem;
 
-@) enzyme
+## enzyme
 	* shallow: no instances in desendants;
 	* equals: full props match
 	* matchesElement: subcollection of props match;
 	* call wrapper.update() when html changed before traversing(find/contains/...);
 	* after updated, find the element again, previous found is not used anymore;
   * mount().prop() gets props of component, shallow().prop() get from root dom.
-@) jest
+## jest
   * it caches outputs files automatically;
 	* `collectCoverageFrom` defaults to what tested;
 	* beforeAll for async;
@@ -942,18 +944,18 @@ this.addEventListener('fetch', function(event) {
 	* [bug] 'verbose' clears console output;
   * transform use babel-jest implicitly, if it's configed, 'babel-jest' should be added explicitly also.
   * 'react-flow-props-to-prop-types' is not compatible with 'istanbul' when 'collectCoverage' is set.
-@) <script>
+## <script>
 	* async: load side by side with parsing, execute immediately after loaded while pausing parsing; 
 	* defer: load side by side with parsing, but enquequed in the order of being encounterd until parsing done to execute.
   * script-inserted scripts execute with different behaviours across browsers. **set async to false to ensure execution order**
 
-@) travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
+## travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
 
-@) new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
+## new version of codeclimate reporter finds lcov reports in 'coverage' directory and no options to overrides.
 
-@) postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
+## postcss-advanced-variables replace sass interpolation `#{$var}` with `$(var)` to separate variable with strings.
 
-@) prettier-eslint --write "**/*.js"
+## prettier-eslint --write "**/*.js"
  * "" is required
  * option error may occur in plugin, ignore them.
 
@@ -1047,11 +1049,11 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
 
 - when dependency number decreased to 0, `define` callback is invoked.
 
-@) test throwing error:
+## test throwing error:
  * chai.expect(function() { fun(arg); }).throw(err);
  * sinon.assert.threw checks after called, does'nt invoke and catch by itself.
 
-@) websocket is and independent protocol based on TCP. however it's handshake is http upgrade request. uri scheme is 'ws/wss'
+## websocket is and independent protocol based on TCP. however it's handshake is http upgrade request. uri scheme is 'ws/wss'
 
     0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1079,7 +1081,7 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
     );
 ```
 
-@) redux-saga
+## redux-saga
  * runSaga: specifiy store/compaitible explicitly instead of in middleware (which binds the store to its first argument middleware.run)
  * sagaEmitter: receive actions from store(dispatch)
  * stdChannel: default channel
@@ -1179,3 +1181,12 @@ interface a {
 - 'hoist' is not turned on by default when install with 'lerna boostrap'
 
 - lerna publish --conventional-commits
+
+## render process
+                       (block Render Tree instead of DOM)
+CSSOM  ---------------------------------------------------------------------
+  | (JS may need get dimension)                                             |
+   ----------------------------> JS                                         |---> Render Tree ---> PAINT
+                                 |             (if no JS)                   |
+                                  ---> DOM [- - - - - - - > FOUC PAINT] ---- 
+> FOUC: flash of unstyled content
