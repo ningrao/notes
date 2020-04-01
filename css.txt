@@ -181,7 +181,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
  	transform-style:preserve-3d;
 	**) this will not be inheritted;
 
-@) vertical align:
+@) vertical center align:
  *) table-cell & vertical-align
  *) flex & align-items
  *) translate
@@ -240,3 +240,9 @@ inline	->	id	->	attr & class	-> element & pseudo element
 @{param}: {}
 ```
 @) `<link href='blob:...'` is not blocking.
+
+@) block formatting context (BFC)
+- block elements
+- overflow: !visible
+- float
+- absolute

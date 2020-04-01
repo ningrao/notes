@@ -736,6 +736,9 @@ initial-scale - visual viewport
 		..) not triggered in mounting;
   .) componentWillUpdate
     ..) can not call setState.
+  .) load data in componentDidMount
+      + remind setting initial state
+      + componentWillMount is called twice both on server side and client when SSR
  * preventDefault instead of 'return false';
  * prop.children represents passed html;
  * fetch for ajax;
@@ -1207,11 +1210,14 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  * include cookie: credentials:'include'
  * http error status is not rejected; 
  * redirect is not accessible in case private data is contained in target url.
+ * shortcuts
+  + abort
+  + progress
 
 - response type
 - error: 
 
-  if csp is violated, this type is returned.
+  if SOP is violated, this type is returned.
 
 - Access-Control-Expose-Headers
 
