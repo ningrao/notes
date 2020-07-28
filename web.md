@@ -1190,3 +1190,10 @@ CSSOM  ---------------------------------------------------------------------
                                  |             (if no JS)                   |
                                   ---> DOM [- - - - - - - > FOUC PAINT] ---- 
 > FOUC: flash of unstyled content
+
+## performance
+- resources parsing is tasked to main thread.
+- `navigator.sendBeacon()`
+
+## DOMContentLoaded 
+html loaded and parsed 

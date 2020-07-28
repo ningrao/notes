@@ -232,8 +232,8 @@ general
 @) don't listen at 80;
 
 @) default heap size: 1.4G(64bit)/512M(32bit)
- *) small part(M): --max-old-space-size=4096 
- [*) large part(K): --max-new-space-size=4096]
+- `--max-old-space-size=4096`
+- `NODE_OPTIONS="--max-old-space-size=4096"`
 
 @) process.env is variables set on commandline when start node;
 
