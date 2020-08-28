@@ -386,3 +386,7 @@ function(args, cb) {
 @) 'find-cache-dir' stores cache in 'node_modules/.cache'
 
 # setTimeout holds event loop open by default (timer.ref() was called, to turn off, call timer.unref()).
+
+## Jest debug
+- `jest-worker/build/workers/ChildProcessWorker.js`
+- `-m=1`
