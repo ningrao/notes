@@ -250,3 +250,13 @@ inline	->	id	->	attr & class	-> element & pseudo element
 - float
 - absolute
 
+## set `min-width` when text blows flex blox.
+
+## multiline text ellipsis
+```
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+```
