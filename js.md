@@ -1297,3 +1297,20 @@ xhr.send();
   not supported. work around: `[\s\S]` instead of `.`.
 
 
+
+## react
+- useEffect
+  + componentWillMount (only once)
+    `useEffect(fun, [])`
+  + skip the first time
+    ```
+  const firstUpdate = useRef(true);
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+
+    console.log("componentDidUpdateFunction");
+  });
+    ```

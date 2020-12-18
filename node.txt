@@ -1,4 +1,4 @@
-set NODE_PATH=%AppData%\npm\node_modules
+set NODE_PATH=%AppData%\npm\node_modules 
 @) install downloaded package in linux:
 1. wget https://nodejs.org/dist/v6.7.0/node-v6.7.0-linux-x86.tar.gz
 2. Extract what you downloaded:
@@ -117,6 +117,12 @@ npm info [-g] pkg
   "postinstall": "node -e \"JSON.parse(process.env['npm_config_argv']).remain[0] && process.exit(1)\" && npm run install-flow || echo",
 ```
 
+## prevent package-lock.json update unrelated packages
+1. remove node_modules
+1. `npm cache clean --force`
+1. revert package-lock.json
+1. `npm i`
+
 ---------------------------------------
 express
 ---------------------------------------
@@ -142,6 +148,8 @@ app.use('/dir1', router);
 --------------------------------------------------------------------------------
 general
 --------------------------------------------------------------------------------
+## v8 options allow words to be separated by both dashes (-) or underscores (_).
+
 @) pros
  *) full stack
  *) render html in server;
