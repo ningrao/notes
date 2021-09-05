@@ -9,20 +9,6 @@ can route with plain link?
 
  * when a new version is issued, the old one is withdrawn automatically;
 
-## regex
-
-|------------|----------|----------|
-|            | positive | negative |
-|------------|----------|----------|
-| lookahead  | `.*?=A`  | `.*?!A`  |
-|------------|----------|----------|
-| lookbehind | `?<=A.*` | `?<!A.*` |
-|------------|----------|----------|
-
--	`(?:.*)` - non-capturing
-
-- `[1^23]` - `^` is ignored, it can appear only at start to indicate each char in this group.
-
  * stages:
 stage-0 - Strawman: just an idea, possible Babel plugin.
 stage-1 - Proposal: this is worth working on.
@@ -58,9 +44,10 @@ stage-4 - Finished: will be added to the next yearly release.
 - array > object indexing > switch > if/then
 
 ## task queue
-* macrotasks: setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
+* macrotasks (new event loop): setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
 * microtasks: process.nextTick, Promises, Object.observe, MutationObserver
 
+## prototype
 - base classes' prototype is a special instance of that class;
  * Function.prototype is function which accepts any arguments and returns undefined;
 
@@ -68,18 +55,10 @@ stage-4 - Finished: will be added to the next yearly release.
 	(0, host.method)();
 'host.method' treated as an expression;
 
-- regexp
- * lookahead:	?=, ?! 
- * lookbehind:	`?<=`, `?<! `
- * non-capture:	?:
- * non-greedy: ? after `+/*`
-
-- function.prototype defaults to { constructor: [itself] }.
+- function.prototype defaults to { constructor: [itself], [[Prototype]]: Object }.
 
 #	ES6
  http://es6-features.org/
-
-- cookie is inaccessible if set 'httpOnly';
 
 - setPrototypeOf() to change __proto__ of an instance;
 
@@ -269,7 +248,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 
 -WeakSet (used to track references to 'object value')
  * nonobject(including null) throws error;
- * when no references to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
+ * when no references (**current** reference to the object in this is weakset/map is not taken into a account) to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
  * no iterator;
  * no size;
 
@@ -304,6 +283,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
   + receives non promise item
   + wait until all items comes to non-promise.
 
+- `then/catch` of resolved promise is added in to execution queue immediately, or it's justed cached until resolve
 
 @ use generator to convert async to sync syntax;
  * callback(call next() in callback):
@@ -411,17 +391,16 @@ run(tasks).then(function(rs){
  * return value in constrcutor works as es5;
  * derived class calls base constructor if no constructors defined.
  * class properties initialization is placed in the last of contructor.
-----------------------------------------------
---	ES7
------------------------------------------------------------------------------------------
+
+##	ES7
+
 - exponential operator(**);
 - Array.prototype.includes
  * NaN can be found(indexOf can't, which uses '===');
 
 
-----------------------------------------------
---	MODULE
-----------------------------------------------
+##	MODULE
+
 - static, e.g. load at compile time
  * import(), proposed dynamic import function.
 
@@ -490,9 +469,11 @@ run(tasks).then(function(rs){
 
 - **default value is included in `import * from` but not in `export * from`**;
 
------------------------------------------------------------------------------------------
-GENERAL
------------------------------------------------------------------------------------------
+
+## GENERAL
+
+- cookie is inaccessible if set 'httpOnly';
+
 - support html style comment;
  
 - XMLHttpRequest send only string converted from what ever type automatically if non-string passed;
@@ -534,6 +515,7 @@ GENERAL
  * builtin property is not enumerable;
  * keys()/getOwnPropertyNames()/getOwnPropertyDescriptor()/Object.prototype.properyIsEnumerable(prop) ;
  * accessor property:
+ ```
  	var obj={
 		_name:'',
 		get name(){
@@ -543,6 +525,7 @@ GENERAL
 			return this._name=n;
 		}
 	};
+  ```
  * Object.defineProperties(obj, {
 	 	x:{value:1, configurable:true},
 	 	y:{
@@ -615,32 +598,35 @@ Reflect.ownKeys()	--string+symbol
 
 
 - strict mode:
-[characteristics]:
- * prevent dynamic scoping
- * less error prone;
- * as a string of 'directive', which should be placed in the beginning of 'script'/'function' with other directives if any;
- 	function(){
-		var a=1;
-		'use strict' //ignored;
-	}
-[rules]:
- * 'eval'/'arguments' are keywords, not writable;
+  + characteristics
+    * prevent dynamic scoping
+    * less error prone;
+    * as a string of 'directive', which should be placed in the beginning of 'script'/'function' with other directives if any;
+    ```
+     function(){
+       var a=1;
+       'use strict' //ignored;
+     }
+    ```
+  + rules
+    * 'eval'/'arguments' are keywords, not writable;
 
- * no 'with';
- * 'eval' runs in a new scope;
- * 'delete' non-member name throws error, instead of ignoring;
- * non-declared variable illicit error, instead of adding to global;
- * property attributes violation throws error, instead of ignored;
+    * no 'with';
+    * 'eval' runs in a new scope;
+    * 'delete' non-member name throws error, instead of ignoring;
+    * non-declared variable illicit error, instead of adding to global;
+    * property attributes violation throws error, instead of ignored;
 
- * 'this' in function(not method) is undefined, instead of global;
- 	var hasStrictMode = (function() { "use strict"; return this===undefined}());
- * host passed to 'call'/'apply' stay as what it is, instead of being converted(null/undefined -> global; non-object -> object);
- * 'caller'/'callee' is inaccessible;
- * 'arguments' is a copy instead of an alias;
- * parameters can't has duplicate names, instead of accessing the first one via 'arguments';
+    * 'this' in function(not method) is undefined, instead of global;
+     var hasStrictMode = (function() { "use strict"; return this===undefined}());
+    * host passed to 'call'/'apply' stay as what it is, instead of being converted(null/undefined -> global; non-object -> object);
+    * 'caller'/'callee' is inaccessible;
+    * 'arguments' is a copy instead of an alias;
+    * parameters can't has duplicate names, instead of accessing the first one via 'arguments';
 
- * json can't has duplicate names, instead of overwritten(*** removed in ES6 ***);
- * octal literal(leading zero of decimal) throws error;
+    * json can't has duplicate names, instead of overwritten(**removed in ES6**);
+    * octal literal(leading zero of decimal) throws error;
+    * `function f() {}` is in block scope
 
 
 - console.log supports formatting as printf;
@@ -1070,7 +1056,7 @@ in baching updates && not in unbatching updates ?
 
   - updater: set in ReactFiberClassComponent.adoptClassInstance.
 
-  - _reactInternalFiber
+  - `_reactInternalFiber`
 
 - HostComponent: native DOM
 
@@ -1268,8 +1254,6 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 
 - touchmove-preventDefault() to overcome that 'pointermove' is 'pointercancel'ed;	
 
-- regexp, backreference, match whole matched string;
-
 - download file via ajax:
 let xhr=new XMLHttpRequest();
 xhr.open('GET', '/tshark.pdf');
@@ -1296,6 +1280,15 @@ xhr.send();
 - single line mode
   not supported. work around: `[\s\S]` instead of `.`.
 
+- backreference, whole match `$&`
+
+- regexp
+ * lookahead:	?=, ?! 
+ * lookbehind:	`?<=`, `?<! `
+ * non-capture:	`(?:.*)`
+ * non-greedy: ? after `+/*`
+
+- `[1^23]` - `^` is ignored, it can appear only at start to indicate each char in this group.
 
 
 ## react
@@ -1314,3 +1307,6 @@ xhr.send();
     console.log("componentDidUpdateFunction");
   });
     ```
+
+## new Function
+- scope is global

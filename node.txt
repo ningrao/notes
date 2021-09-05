@@ -396,5 +396,5 @@ function(args, cb) {
 # setTimeout holds event loop open by default (timer.ref() was called, to turn off, call timer.unref()).
 
 ## Jest debug
-- `jest-worker/build/workers/ChildProcessWorker.js`
-- `-m=1`
+- `node --inspect node_modules/jest/bin/jest --runInBand`
+- `debugger`

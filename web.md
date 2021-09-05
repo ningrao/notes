@@ -136,9 +136,11 @@ architecture & design
 ## flux(architecture): redux, facebook, reflux, alt...;
  - unidirectional data flow: view doesn't modify model;
  - bypassing data flowing through components hierarchy, managing states outside the root component;
+ ```
  action -> dispatcher -> store -> view
  	|		(user interaction)		|
 	<--------------------------------
+ ```
  - cons: 
  	.) hard to scale;
 
@@ -156,12 +158,18 @@ architecture & design
 
 
 ## web component(standard for module):
- - custom element life cycle events: connected/disconnected/attributeChanged/adopted;
+ - custom element
+  + life cycle events: connected/disconnected/attributeChanged/adopted;
  - shadow dom
-  + js is not encapsulated
- - html import
+  + js is not encapsulated, but `querySelector` and `getElementById` won't traverse into, start from `shadowRoot` instead.
+  + `::shadow p` control from outside
+    - `body /deep/ p` any root
+  + `::host` control container from inside
+  + event retargeted to host
+  
+ - html import (obsolete, superceded by html module)
   + css is **not** applied
-  + js is executed
+  + js is executed and encapsulated
  - template & slot
  - pros:
  	.) native
@@ -993,6 +1001,7 @@ this.addEventListener('fetch', function(event) {
   * ignore path is regexp pattern matching against absolute path (<PROJECT_ROOT> is symbol for root dir)
   * ingored files will be unresolvable.
   * check-contents always resolve bases on root dir.
+  * `Function` is alias to `any`
 
 npmjs: roney
 
@@ -1197,3 +1206,30 @@ CSSOM  ---------------------------------------------------------------------
 
 ## DOMContentLoaded 
 html loaded and parsed 
+
+## cypress
+- `a` click will not fire native event as jquery behavior
+- `.text()` should be invoked in `should(function)` or as `.invoke('text')`
+- it only retries the last one function
+- all functions don't return the value directly, get it in `then`, `should`
+
+## cross-domain communication
+- server proxy
+- jsonp
+- cors
+  + simple request
+- postMessage
+- window.name
+  one way
+- document.domain
+  + only child to parent
+  + both should set explicitly even already the domain
+- `#hash`
+- websocket
+  check "origin" header from server (blacklist)
+
+## node-gyp on windows
+`choco install python visualstudio2017buildtools visualstudio2017-workload-vctools -y`
+- python2
+- [vsbuild2017](https://download.visualstudio.microsoft.com/download/pr/343898a7-7d12-4faa-b5df-958b31e57b3e/1ed6bc00aaf9df4b43c5dad91bf046257376cd13764dbf0d044208684adc4c2a/vs_BuildTools.exe)
+- [vc++](https://download.visualstudio.microsoft.com/download/pr/7239cdc3-bd73-4f27-9943-22de059a6267/003063723B2131DA23F40E2063FB79867BAE275F7B5C099DBD1792E25845872B/VC_redist.x64.exe)

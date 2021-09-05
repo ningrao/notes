@@ -194,6 +194,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
 ## resolution: density of pixels to physical dimension;
 
 ## device-pixel-ratio: physical pixels/logical(reported/density-independent) pixels; 
+    `devicePixel/cssPixel`
 - when high resolution device reports device width as predecessor(pixel turns to logical), but pixel contains more than one physical pixels;
 - apple specific for retina; 
 - physical pixels=reported pixels*ratio:	real divice-width is divice-width*device-pixel-ratio;
@@ -215,10 +216,11 @@ inline	->	id	->	attr & class	-> element & pseudo element
 ## precss focuses on syntax; cssnext focuses on new styles.
 
 ## viewport(applied only in mobile browser)
-  all size are logical pixel: DIP (device-independent-pixel).
+  cssPixel: logical pixel, DIP (device-independent-pixel).
 
 - layout viewport: content width
   * document.documentElement.clientWidth;
+    `rem` base
   * html{}
 - visual viewport (varies by distance between window and content): content width in window
   * window.innerWidth (supported badly)
@@ -226,6 +228,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
 - `meta[viewport]`
   * width: layout viewport (device-width: screen.width)
   * scale (device-width/visual-width): control visual viewport, e.g. content pixels displayed in window via changing distance.
+    `cssPixel/devicePixel`
 
 ## requestAnimationFrame may not trigger 'trainsition';
 
