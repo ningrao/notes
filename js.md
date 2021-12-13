@@ -43,10 +43,6 @@ stage-4 - Finished: will be added to the next yearly release.
 
 - array > object indexing > switch > if/then
 
-## task queue
-* macrotasks (new event loop): setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
-* microtasks: process.nextTick, Promises, Object.observe, MutationObserver
-
 ## prototype
 - base classes' prototype is a special instance of that class;
  * Function.prototype is function which accepts any arguments and returns undefined;
@@ -139,12 +135,11 @@ for(let i=0, len='len2'; i<3; i++, len+='a', console.log(len)){		--scope 2
 - copy property:
  * Object.assign(), adopt '=' to copy, so no accessor property is copied;
  * Object.assign(), adopt 'for in' to enumerate, so non-enumerable property is not copied;
- * Object.mixin(), also copy accessor property, but no methods;
 
 
 - own property enumerating order:
 numeric(ascending) -> string(appear) -> symbol(appear);
- + only applied to Object.getOwnPropertyNames()/Reflect.ownKeys(); except for 'for in'/Object.keys()/JSON.stringify();
+ + only applied to Reflect.ownKeys(); except for 'for in'/Object.keys()/JSON.stringify();
 
 
 - string
@@ -533,13 +528,13 @@ run(tasks).then(function(rs){
 			enumerable:true
 		}
 	});
- * enuerate own properties: Object.keys()/entries/values();
+ * enumerate own properties: Object.keys()/entries/values();
  	.) not instance object;
 	.) no builtin Symbol.iterator;
 
 - 
 'for in'/keys()	--enumerable(inherited);
-in/getOwnPropertyNames()	--enumerable+unenumerable
+in/getOwnPropertyNames()	--enumerable+unenumerable (no symbols)
 getOwnPropertySymbols()	--symbol properties
 Reflect.ownKeys()	--string+symbol
 
@@ -614,7 +609,7 @@ Reflect.ownKeys()	--string+symbol
     * no 'with';
     * 'eval' runs in a new scope;
     * 'delete' non-member name throws error, instead of ignoring;
-    * non-declared variable illicit error, instead of adding to global;
+    * non-declared variable incurs error, instead of adding to global;
     * property attributes violation throws error, instead of ignored;
 
     * 'this' in function(not method) is undefined, instead of global;
@@ -689,6 +684,8 @@ initial-scale - visual viewport
 *) if layout is less than visual, it's extended; because visual can't be larger than layout.
 
 - XMLHttpRequest doesn't support 'CONNECT, TRACE, and TRACK';
+withCredential
+can not read even sent.
 
 
 - web component
@@ -1199,6 +1196,7 @@ https://tonyhb.gitbooks.io/redux-without-profanity
  * stream: response.body - ReadableStream
  * cache
  * include cookie: credentials:'include'
+  `Access-Control-Allow-Credentials`
  * http error status is not rejected; 
  * redirect is not accessible in case private data is contained in target url.
  * shortcuts
@@ -1310,3 +1308,11 @@ xhr.send();
 
 ## new Function
 - scope is global
+
+## throw
+traditionally, it can only appear in a single statement as
+`;throw 'abc';`
+- a proposal to support placing in an expression
+<https://github.com/tc39/proposal-throw-expressions>
+`() => throw 'abc'`
+`a ? b : throw 'abc'`

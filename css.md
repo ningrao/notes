@@ -3,15 +3,14 @@
 - <https://drafts.csswg.org/>
 
 ## specificity:
-------------------------------------------
-sass
-------------------------------------------
+inline	->	id	->	attr & class	-> element & pseudo element
+
+## sass
+
 - semicolon is mandatory;
 - import from alias defined in webpack (no extension):
   @import '~Styles/main';
 
-------------------------------------------------------------
-inline	->	id	->	attr & class	-> element & pseudo element
 
 ### optimization
 - shorthand
@@ -114,16 +113,20 @@ inline	->	id	->	attr & class	-> element & pseudo element
 ## 7 layouts: block, inline, table, positioned, column, flex, grid;
 
 ## flex(disply:flex/inline-flex): to make content always fill container by growing/shrinking; items with the same dimension in cross-axis;
-- items have equal and full size in cross axis as table-cell;
+- by default, grow is turned off, shrink is on
 - if wrap is enabled, the sizes on cross axis is divided according to their actual size.
 - no effect: column, float/clear, vertical-align, ::first*;
 - direct text is wrapped in anonymous item;
 - absolutely positioned child doesn't participate in the flex layout;
 - percentage in padding/margin on item is not consistent across browsers;
-- flex-basis: initial width before fill is applied, take precedence over 'width/height';
+- flex-basis: initial width/height before fill is applied, take precedence over 'width/height';
+  + auto: calc the original size on the fly
+  + 0: won't shrink other siblings 
 - flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space or shrinked space;
 - flex-wrap:wrap; grow/shrink no need to exist;
 - if no flex-grow/shrink is specified, fill based on the propotion of their basis;
+- flex-direction: row/collumn
+  children runs in a row/collumn
 
 - align: 
 
@@ -140,11 +143,13 @@ inline	->	id	->	attr & class	-> element & pseudo element
 
     flex-start | flex-end | center | space-between | space-around | stretch 
 
-    - align-content: multi-line only
+    - align-content: for multi-line/wrap only
 
   + stretch: expand to the same size
 
-- flex: num num unit;	grow/shrink/basis; when less than three, grow take precedence than shrink;
+- flex: num num unit;	grow/shrink/basis;
+  + when less than three, grow take precedence than shrink;
+  + basis is set to 0 when absent
 - flex-flow: direction + wrap.
 - by default grow/shrink respect their ratio of flex-basis.
 
@@ -248,12 +253,17 @@ inline	->	id	->	attr & class	-> element & pseudo element
 ## `<link href='blob:...'` is not blocking.
 
 ## block formatting context (BFC)
-- block elements
-- overflow: !visible
-- float
-- absolute
++ styles
+  - overflow: !visible
+  - float: !none
+  - position: absolute/fixed
+  - display: table-cell, table-caption, inline-block, flex/inline-flex
 
-## set `min-width` when text blows flex blox.
++ margin collapse won't happen between BFC
++ could contain floats (height exists)
++ left edges of children (if not BFC) are aligned to the BFC
+
+## set `min-width` when text blows flex box.
 
 ## multiline text ellipsis
 ```

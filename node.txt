@@ -25,6 +25,8 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
  *) win: %appdata%\npm\node_modules
  *) linux: /usr/lib/node_modules
 
+# by default it installs dependencies flat, conflicting versions are installed nestedly.
+
 @) 'npm no such file or directory, ... .staging ...' 
 
 remove package-lock.json
@@ -123,6 +125,19 @@ npm info [-g] pkg
 1. revert package-lock.json
 1. `npm i`
 
+## `npm i/ci`
+install all four kinds dependencies.
+- respect `--omit=...`
+- `--production` equal to `--omit=dev`
+- both exists in dependencies and omited, will be omited.
+
+- `ci` still consults `package.json` as source of truth, if `dependencies` in `package-lock.json` is empty (the file should exist however)
+
+## only `npm i` without specific module specified could hoist
+
+## list versions
+`npm version pkg versions`
+
 ---------------------------------------
 express
 ---------------------------------------
@@ -170,7 +185,7 @@ general
  *)	when load a directory, it checks:
 	'main' in package.json	->	index.js	->	index.json	->	index.node -> 'main'
  *) require('pkg')	-> installed package 
- * find in paths in 'global.module.paths'
+ * find in paths in 'module.paths'
 
 	require('./file')	-> local file
 
@@ -181,6 +196,25 @@ general
  *) require.resolve returns the found path;
  *) `~` can not expand, use 'process.env.HOME' instead;
  *) it's not stored in `global`.
+
+## patch require paths after v10
+```
+// We should work on the same tools with react-script,
+// such as Webpack and related.
+
+const path = require('path');
+const fromCRA = path.resolve(__dirname, '../node_modules/react-scripts/node_modules/')
+
+module.exports = function(moduleFrom) {
+  const { _nodeModulePaths } = module.constructor
+  module.constructor._nodeModulePaths = (from) => {
+    const paths = _nodeModulePaths.call(this, from)
+    paths.unshift(fromCRA)
+    return paths
+  }
+  moduleFrom.paths.unshift(fromCRA)
+}
+```
 
 @) module.js
  *) _compile(): execute the script
@@ -260,8 +294,10 @@ general
 
 @) debug
  *) c(cont)/n(over)/s(in)/o(out)/pause
- *) run 'repl', then view target varibles;
- *) exec console.log(''); exec varName (better than repl for reading variable once);
+ - variable
+   + run 'repl', then view target variables;
+   + exec varName (better than repl for reading variable once);
+ *) exec console.log('');
  *) sb/cb/breakpoints([file,] line) 
  *) scripts: list loaded scripts
  *) watch/unwatch/watchers expr
@@ -343,6 +379,7 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
   *) stdio: default is pipe
     * pipe: parent.stdio.pipe(child.stdio); the pipes (child.stdout/stdin/stderr) are also available to other streams.
     * inherit: child.stdio === parent.stdio
+      redirect all to parents.
 
 @) kill child process and its descendents:
    const child = spawn('node', ['node_modules/babel-cli/bin/babel-node.js', 'test.js'], {detached:true});
@@ -354,7 +391,7 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 
 @) path.resolve
  *) returns an absolute path; 
- *) the last supplied absolute path supersedes the formers (abandoned);
+ *) from right to left, the last supplied absolute path supersedes the formers (abandoned);
  *) if none is supplied, cwd is applied;
 
 @) url.resolve vs url. 
@@ -395,6 +432,13 @@ function(args, cb) {
 
 # setTimeout holds event loop open by default (timer.ref() was called, to turn off, call timer.unref()).
 
-## Jest debug
-- `node --inspect node_modules/jest/bin/jest --runInBand`
-- `debugger`
+## task queue
+macro task -> micro task -> macro task
+              micro task              
+              micro task              
+              micro task              
+              (...exhausted)
+
+* macrotasks (new event loop): setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
+* microtasks: process.nextTick, Promises, Object.observe, MutationObserver
+  - `process.maxTickDepth` prevent that micro tasks queue another to incur indefinite loop

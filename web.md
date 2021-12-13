@@ -51,11 +51,13 @@ https://www.owasp.org
 ## test pyramid: ratio of amount of tests between the three types(from top to bottom):
 	end-to-end	->	intergration	-> unit
 
-## header Strict-Transport-Security: https only
-
-## header Content-Security-Policy: specify valid resources uri;
+## header Content-Security-Policy(CSP): specify valid resources uri;
 
 `Content-Security-Policy: frame-src https://example.com/`
+script-src/frame-src/object-src/img-src/base-uri/
+
+## HTTP Strict Transport Security(HSTS)
+`Strict-Transport-Security`, https only
 
 ## normalized table:
  1st) primary key; atomic value; no repeating columns(value1, value2, value3...);
@@ -102,6 +104,7 @@ architecture & design
  - change detection 
  	 .) zone.js
 	 .) unidirectional tree based 
+      data flow from parent to child only.
 	 .) observable&immutable
  - route load on-demand;
  - independent on runtime environment;
@@ -155,6 +158,11 @@ architecture & design
  - cons: 
  	.) 
 
+## react vs vue
+- react
+DOM diff
+- vue
+data tracking
 
 
 ## web component(standard for module):
@@ -165,9 +173,10 @@ architecture & design
   + `::shadow p` control from outside
     - `body /deep/ p` any root
   + `::host` control container from inside
-  + event retargeted to host
+  + event target is hoisted to its host
   
- - html import (obsolete, superceded by html module)
+ - html import
+  obsolete, superceded by html module <https://github.com/WICG/webcomponents/blob/gh-pages/proposals/html-modules-proposal.md>
   + css is **not** applied
   + js is executed and encapsulated
  - template & slot
@@ -329,7 +338,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
  - babel-register: overwrite 'require' to compile nodejs files on the fly;
  - babel-node: put in babel-polyfill and call babel-register internally;
  - doesn't bundle, so es6/cjs import/export let it is. (es6 module syntax can be converted to other)
- - 'env/es' should be placed before 'stage-*';
+ - 'env/es' should be placed before `stage-*`;
  - 'ignore' is normalized into 'array', env is deep merged. **can not override**
  - babel-plugin-dynamic-import-node: return require() in a promise
  - babel-plugin-dynamic-import-webpack: require.ensure()
@@ -857,11 +866,17 @@ this.addEventListener('fetch', function(event) {
  - no expiration date, except manifest changes;
 
 ## http2/SPDY
- - multiplex streams: all files in a single connection
-  * divided into binary frames sent asyncally.
-  * prioritizing
- - server push
- - header compression
+- multiplex streams: all files in a single connection
+ * divided into binary frames sent asyncally.
+ * prioritizing
+ * head-of-line blocking occurs when packets lost
+- server push
+won't be applied to webpage, just cached.
+ 
+- header compression
+
+## http3
+http over QUIC.
 
 ## http/2 dependency tree priority model
  * 
@@ -871,6 +886,7 @@ this.addEventListener('fetch', function(event) {
 ## Clickjacking: cover page with an iframe, which hosts a third-party page which accept user inputs(click/type);
  - top!=window&&(top.location=window.location);
  - X-Frame-Options: Deny/SAMEORIGIN
+ - scp: frame-src
 
 ## eslint:
  - dot file is ignored by default;
@@ -943,6 +959,7 @@ this.addEventListener('fetch', function(event) {
 	* call wrapper.update() when html changed before traversing(find/contains/...);
 	* after updated, find the element again, previous found is not used anymore;
   * mount().prop() gets props of component, shallow().prop() get from root dom.
+
 ## jest
   * it caches outputs files automatically;
 	* `collectCoverageFrom` defaults to what tested;
@@ -952,10 +969,48 @@ this.addEventListener('fetch', function(event) {
 	* [bug] 'verbose' clears console output;
   * transform use babel-jest implicitly, if it's configed, 'babel-jest' should be added explicitly also.
   * 'react-flow-props-to-prop-types' is not compatible with 'istanbul' when 'collectCoverage' is set.
-## <script>
-	* async: load side by side with parsing, execute immediately after loaded while pausing parsing; 
-	* defer: load side by side with parsing, but enquequed in the order of being encounterd until parsing done to execute.
-  * script-inserted scripts execute with different behaviours across browsers. **set async to false to ensure execution order**
+
+  - `import * as abc from ...`
+    change `abc.field` affects everywhere
+
+  -  debug
+    `node --inspect node_modules/jest/bin/jest --runInBand`
+    `debugger`
+
+  - jest.mock will be hoisted to the top (variable reference results error) 
+    + jest.requireActual
+    + `jest.doMock()` will no be hoisted
+
+  - force `shallow` to render nested components `shallow().dive()`
+
+  - react lifecycle event
+    ```
+    const spyDidMount = jest.spyOn(HomePage.prototype, 'componentDidMount')
+    const spyWillUnmount = jest.spyOn(HomePage.prototype, 'componentWillUnmount')
+    const wrapper = shallow(
+      <Provider store={store}>
+        <HomePage {...props}/>
+      </Provider>
+    ).dive()
+    expect(spyDidMount).toHaveBeenCalled()
+    wrapper.unmount()
+    expect(spyWillUnmount).toHaveBeenCalled()
+    ```
+
+  - find Component
+    + Component constructor
+      `import SomeComp from ''; find(SomeComp)`
+    + Component rendered name
+      `find('SomeComp')`
+    + with specific prop
+      `find('EDSRectangleButton').find({weight: 'loud'})`
+      - `key/ref` don't work
+    + dom selector doesn't work such as '.class_name'
+ - `simulate` works on Component
+
+## craco debug
+200~@craco/craco/bin/craco.js
+processArgs.unshift('--inspect-brk')
 
 ## travis adopt a new vm each time for a new build. cache file for saving download time is in vain, since downloading for cache server has no difference.
 
@@ -966,7 +1021,7 @@ this.addEventListener('fetch', function(event) {
 ## prettier-eslint --write "**/*.js"
  * "" is required
  * option error may occur in plugin, ignore them.
-
+ * option error may occur in plugin, ignore them.
 ## flow
   * Node/Element exists in core, in React as well. 
   * object.keys can infer types correctly, but values/entries not until v0.66.
@@ -1185,27 +1240,76 @@ interface a {
 ## lerna
 - '--scope'
   - match agains 'name'
-  - '*' can not match non-alpha-numeric chars such as '@', '/';
+  - * can not match non-alpha-numeric chars such as '@', '/';
 
 - 'hoist' is not turned on by default when install with 'lerna boostrap'
 
 - lerna publish --conventional-commits
 
 ## render process
+
+```
+DOM -> CSSOM -> RenderTree -> Layout -> Paint -> Compositing
+
                        (block Render Tree instead of DOM)
 CSSOM  ---------------------------------------------------------------------
   | (JS may need get dimension)                                             |
    ----------------------------> JS                                         |---> Render Tree ---> PAINT
                                  |             (if no JS)                   |
                                   ---> DOM [- - - - - - - > FOUC PAINT] ---- 
-> FOUC: flash of unstyled content
+```
+
+- DOM
+**incrementally** parsing and rendering, main thread
+- CSSOM
+  stylable node tree, main thread
+- RenderTree
+  displayed (has dimensions) node tree, **incremental**
+- FOUC: flash of unstyled content
+- DOMContentLoaded 
+DOM tree contructed and safe to access.
+ + DOMParser blocking scritps (including defer)
+ + Script-blocking css
+ + other css (most browsers)
+- external resources
+download in other threads other than main thread
+  + script
+    * async: load side by side with parsing, execute immediately after loaded while pausing parsing; 
+      - load first run first
+    * defer: load side by side with parsing, and enquequed in the order of being encounterd until parsing done (domInteractive(document.readyState === interactive): whole DOM tree is contructed) to execute.
+      - execute in order
+    * preload: async but won't be applied (usually for those appear in js/css or next html page).
+      - change rel for stylesheet
+      - create new script
+
+    * HTTP/2 server push
+    * script-inserted script tag, `async` by default
+      **set async to false act as `defer` to ensure execution order**
+    * DOMParser blocker (halting main thread). execute in main thread.
+      - normal
+      - defer
+  + css
+    when each file is downloaded, update CSSOM, then continue DOM parsing and RenderTree constructing and painting.
+    - render blocking (Render Tree construction is halted).
+    - script blocking (scripts after it will not run until this is loaded).
+
+- metrics
+  + FP
+  first paint, such as background
+
+  + FCP
+  First Contentful Paint, such as text or image
+
+  + LCP
+  Largest Contentful Paint, the first full page without scrolling
+
+  + FMP
+  first meaningful paint, similar to LCP
 
 ## performance
 - resources parsing is tasked to main thread.
 - `navigator.sendBeacon()`
 
-## DOMContentLoaded 
-html loaded and parsed 
 
 ## cypress
 - `a` click will not fire native event as jquery behavior
