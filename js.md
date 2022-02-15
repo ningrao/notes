@@ -23,7 +23,7 @@ stage-4 - Finished: will be added to the next yearly release.
 
 - batch new dom in container/fragment 
 
-- reduce doms (large number records: custom scrolling/empty hidden records + indexed DB (searching))
+- reduce doms (paging, large number records: custom scrolling/empty hidden records + indexed DB (searching))
 
 - simple selector
 
@@ -142,13 +142,25 @@ numeric(ascending) -> string(appear) -> symbol(appear);
  + only applied to Reflect.ownKeys(); except for 'for in'/Object.keys()/JSON.stringify();
 
 
-- string
- * code point is the actual data size of a char;
- * code unit is the basic size of a char for an encoding(16 bits for utf16);
- * utf16 char may occupy two code units(Basic Multilingual Plane + Supplementary plane -> surrogate pair), 
- * String.length calc number of units instead of points; incorrect for char of two units, fix:
- 	String.match(/./gu).length
- * subscript is also based on code unit, for+of fixes this;
+- string (utf16 inside)
+  + unicode
+    * code point is the encoded number (index in the encoding table)
+    * code unit is the basic size of storage for an encoding(16 bits for utf16);
+    * one char (code point) may consists of multipe code units (double 16 in utf16)
+      encoded as a surrogate pair (low + high), not the code piont directly.
+        - low (D800-DBFF)
+        - high (DC00-DFFF)
+      '🙂' (code point: '1f642', code units: 'd83d' + 'de42'
+    * String.length calc number of units instead of points; incorrect for char of two units, fix:
+      - String.match(/./gu).length
+      - `for..of`
+      - `str.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_').length`
+    * subscript is also based on code unit, for+of fixes this;
+    * `charCodeAt/codePointAt`
+      - index is code unit
+      - `charCodeAt` only returns one code unit
+      - `codePointAt(0)` returns the full code point
+      - `codePointAt(1)` truncated
  * regex matching start point:
  	.) no flag: 0
 	.) 'g': lastIndex and forward
@@ -246,6 +258,16 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
  * when no references (**current** reference to the object in this is weakset/map is not taken into a account) to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
  * no iterator;
  * no size;
+ ```
+let john = { name: "John" };
+
+let weakMap = new WeakMap();
+weakMap.set(john, "...");
+
+john = null; // overwrite the reference
+
+// john is removed from memory!
+ ```
 
 - Map
  * not to coerce key into string as object;
@@ -272,7 +294,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
 	.) when error is thrown, the new promise is rejected;
  	.) returned value in both handler is passed to the new promise resolve();
 	.) if a promise is returned, its result is passed;
- * in promise chain, if a reject handler exists, the following promise is fulfilled, unless error thrown in that handler also;
+ * in promise chain, if a reject handler exists, the following promise is fulfilled, unless error thrown in that handler as well;
  * its always async, even already resolved.
  * promise.all 
   + receives non promise item
@@ -446,7 +468,7 @@ run(tasks).then(function(rs){
 	.) export {val1 as default}; (**val1 is substituted with name 'default' when `import *`**)
   .) default exported value is placed in a field named 'default'; so `import sth from` is short for `import {default as sth} from`
 
-- imort:
+- import:
  * only execute once no matter how many times it's imported;
  * imort default:
 	.) import defName, {va1} from path;
@@ -488,8 +510,6 @@ run(tasks).then(function(rs){
 
 - string is an readonly array; to invoke array methods on it, it's necessary to convert to array first (split('')); 
 
-- 'in' test also check prototype;
-
 - 'forEach' accepts a second param act as the host of callback function;
 
 - Array:
@@ -506,7 +526,7 @@ run(tasks).then(function(rs){
  * slice clones the buffer, subarray doesn't; 
 
 - Object:
- * Object.create: if no argument specified, the object has no builtin members; pass Object.prorotype to create a regular object;
+ * Object.create: if null is passed (undefined is not allowed), the object has no builtin members; pass Object.prorotype to create a regular object;
  * builtin property is not enumerable;
  * keys()/getOwnPropertyNames()/getOwnPropertyDescriptor()/Object.prototype.properyIsEnumerable(prop) ;
  * accessor property:
@@ -532,11 +552,13 @@ run(tasks).then(function(rs){
  	.) not instance object;
 	.) no builtin Symbol.iterator;
 
-- 
-'for in'/keys()	--enumerable(inherited);
-in/getOwnPropertyNames()	--enumerable+unenumerable (no symbols)
-getOwnPropertySymbols()	--symbol properties
-Reflect.ownKeys()	--string+symbol
+- enumeration
+  + 'for in'/keys()	--enumerable(inherited);
+  + in/getOwnPropertyNames()	--enumerable+unenumerable (no symbols)
+    - 'in' test also check prototype;
+
+  + getOwnPropertySymbols()	--symbol properties
+  + Reflect.ownKeys()	--string+symbol
 
 - iterator generator is a function with name with '*' prefix;
  * default iterator generator used for 'for...of' has the function name '[Symbol.iterator]';
@@ -572,19 +594,22 @@ Reflect.ownKeys()	--string+symbol
 		yield true;
 	}
 
-- accessor property:
+- accessor property (defineProperty/defineProperties):
  * getter/setter can be removed as a whole by deleting the accessor property;
+ * getter/setter can not coexist with 'value'
  * default values of attributes are 'false' when the property is set by defineProperty, whereas 'true' when set in the traditional form;
  * when modify an spicific attribute, others stay untouched; 
- * non-configurable property can change its writable from true to false;
- * non-configurable property can't be deleted; 
+ * non-configurable
+  - CAN change its writable from true to false;
+  - can NOT be deleted; 
  * non-writable but configurable property can change value by defineProperty;
  * setter/getter is controlled by 'configurable';
  * setter/getter can be changed only by defineProperty;
  * 'writable' only controls data property, incurs error if coexist with getter/setter when define;
- * 'value' can be a method;
+ * 'value' can be a function;
 
 - extensibility(three functions are one way operation/can't be reversed back):
+  > extensibility applied to an object, configurable + writable applied to existing properties.
  * of nonextensible object, its prototype can have new property;
  * nonextensible object can delete its property, but can't add back;
  * preventExtensibility()	-> extensible
@@ -663,24 +688,26 @@ trace = function (a, c) {
 screen's, which is hardly used on desktop.
 
 - two viewports:
-*) layout viewport: a large picture;
-*) visual viewport: a small frame through which we look the picture. when zoom
-in, it's taken closer to the picture, vice versa it's zoomed out.
+*) layout viewport: the full content box
+*) visual viewport: the size of the content visible zooming into window
 
-- although document.documentElement stands for html tag, its
-clientWidth/height stands for the viewport's(layout), not of its own, which can be
-gotten from offsetWidth.
 
--visual viewport's dimension can be gotten from window.innerWidth/height.
+- visual viewport's dimension can be gotten from window.innerWidth/height.
 
 - layout viewport dimension is arbitary varing between different browsers:
 Safari iPhone uses 980px, Opera 850px, Android WebKit 800px, and IE 974px.
 
--scale= ideal viewport width / visual viewport width
+- scale
+  screen width / visual viewport width
+  window.outerWidth(screen.width) / window.innerWidth
 
 - in meta tag 'viewport' to controll viewports:
-width - layout viewport
-initial-scale - visual viewport
+  + width
+    layout viewport
+  + initial-scale
+    - implies `width=device-width`
+    - by default it's set to make visual == layout
+
 *) if layout is less than visual, it's extended; because visual can't be larger than layout.
 
 - XMLHttpRequest doesn't support 'CONNECT, TRACE, and TRACK';
@@ -719,14 +746,16 @@ can not read even sent.
  * PureComponent apply shadow comparison in shouldComponentUpdate(); pass new object when property changed;
  * parent re-render will trigger descendents re-render;
  * 6 lifecycle events: componentWillMount/componentWillReceiveProps/(shouldComponentUpdate)/componentWillUpdate/componentDidUpdate/componentDidMount/componentWillUnmount/;
- 	.) componentWillReceiveProps
+ 	- componentWillReceiveProps
 		..) props may be the same(parent rerender);
 		..) not triggered in mounting;
-  .) componentWillUpdate
+  - componentWillUpdate
     ..) can not call setState.
-  .) load data in componentDidMount
+  - load data in componentDidMount
       + remind setting initial state
-      + componentWillMount is called twice both on server side and client when SSR
+  - none is called except for `componentWillMount` in server side for SSR
+    + data is loaded manually from static methods
+    + may check if call again fired in componentWillMount in client
  * preventDefault instead of 'return false';
  * prop.children represents passed html;
  * fetch for ajax;
@@ -1191,8 +1220,9 @@ https://tonyhb.gitbooks.io/redux-without-profanity
 -----------
 
 - fetch(https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch);
- * cors(default): dictate browser, whether to send, check access control header from server;
- * no-cors: access control header is not required, but methods, headers and response properties are restricted, and error message is opaque if server rejected;
+  + mode
+    - cors(default): dictate browser, whether to send, check access control header from server;
+    - no-cors: one way, response even error inaccessible.
  * stream: response.body - ReadableStream
  * cache
  * include cookie: credentials:'include'
@@ -1268,6 +1298,7 @@ xhr.onload=function(){
 xhr.send();
 
 - instanceof check if one of __proto__ in the chain is equal to that class/function's prorotype
+  `__proto__` is not accessible anymore (removed)
 
 - ToInt32: adopts `floor`
 
@@ -1286,7 +1317,7 @@ xhr.send();
  * non-capture:	`(?:.*)`
  * non-greedy: ? after `+/*`
 
-- `[1^23]` - `^` is ignored, it can appear only at start to indicate each char in this group.
+- `[1^23]` - `^` itself instead of negation when not at the beginning.
 
 
 ## react

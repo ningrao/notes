@@ -1,9 +1,15 @@
+## standard level
+kind of version
+
 ## docs
 - <https://www.w3.org/Style/CSS/current-work>
 - <https://drafts.csswg.org/>
 
 ## specificity:
 inline	->	id	->	attr & class	-> element & pseudo element
+
+## precedence
+inline > external
 
 ## sass
 
@@ -16,10 +22,14 @@ inline	->	id	->	attr & class	-> element & pseudo element
 - shorthand
 - composite selectors to composite name
 - trigger GPU (transition, 3d transform, canvas, WebGL)
+  - new stacking context
+  - new layers (<video>, <canvas> and <iframe>)
 - absolute/fixed position animationed target
 - too slight animation steps to achieve better smoothness may cause cpu jagging, then instead diminish smoothness.
 - avoid table layout (element after affect those before, them multiple passes are needed), or set `table-layout: fixed`
 - limit the class scope (as nearer as possible to the target) 
+- `font-display: fallback;` to prevent blocking
+- `contain` <https://developer.mozilla.org/en-US/docs/Web/CSS/contain>
 
 
 ## BEM naming:
@@ -27,7 +37,7 @@ inline	->	id	->	attr & class	-> element & pseudo element
 - Element: .block__elm
 - Modifier: .block__elm--color-red
 
-## hsl(0-360, 0-1, 0-1)
+## hsl(0-360, %, %, .1)
 
 ## region chain:
 - flow-into: named_flow
@@ -186,10 +196,6 @@ inline	->	id	->	attr & class	-> element & pseudo element
  	transform-style:preserve-3d;
 	+ this will not be inheritted;
 
-## vertical align:
-- table-cell & vertical-align
-- flex & align-items
-- translate
 
 ## width: browser window; device-width: screen
 - equal in mobile, since usually browser window is not resizable;
@@ -207,10 +213,6 @@ inline	->	id	->	attr & class	-> element & pseudo element
 - size user can manipulate (js/css) are all logical DIP
 
 ## when orientation changes, apple devices don't swap 'device-width'/'device-height' as other venders;
-
-## zoom changes 'device-width';
-- by default mobile browser zoomed out to 980/800... , causing media query get fause values;  
-- meta: width=device-width to prevent default zooming;
 
 ## only when image is broken, it's ':before'/':after' takes effect;
 
@@ -273,3 +275,43 @@ inline	->	id	->	attr & class	-> element & pseudo element
     -webkit-box-orient: vertical;
     display: -webkit-box;
 ```
+
+## vertical center
+- inline
+  + padding
+  + line-height
+  + table-cell
+  + flex (height fixed)
+    - `flex-direction: row; align-items: center`
+    - `flex-direction: column; justify-content: center`
+    - `margin: auto` in children
+- block
+  + absolute + top + margin-top (height known)
+  + absolute + top + translateY (height unknown)
+  + table + table-cell (may stretch the height of container)
+  + left/top/right/bottom: 0; margin: auto; position: absolute; (child)
+
+- grid + margin-auto
+
+## blend
+- background (backround urls and color)
+> the first url at top
+> `normal` by default, no blending
+```
+background-image: url(first-image.png), url(second-image.png);
+background-color: orange;
+background-blend-mode: screen, multiply;
+```
+- element (with other elements behind in the same stacking context)
+`mix-blend-mode`
+  
+
+- new stacking context
+  + `isolation: isolate;`
+  + `opacity` other than 1
+  + `position: fixed`
+  + will-change
+  + filter
+  + transform
+  + animation
+

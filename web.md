@@ -22,27 +22,39 @@ W3C spec
 https://www.owasp.org
 
 ### optimization
-- multiple domains to achieve parallel downloadings (two for each domain per http 1.1); however too much cause dns lookup penalty.
+- server side
+- network
+  + CDN
+  + cache strategy
+  + compress
+  + mutiple domains to achieve parallel downloadings (two for each domain per http 1.1); however too much cause dns lookup penalty.
+  + cookie free domain for assets
+  + keep-alive
+  + reduce redirects
 
-- cookie free domain for assets
+- resources
+  + combine
+  + minimize
+    - image
+      + static gif to palette PNG (PNG8)
+      + optimize images with tool
+      + no scaling images
+  + reduce web fonts
+  + `link` in header to ensure progressive rendering (some browsers intend to avoid reflow when find link in body, they don't render before loading done)
 
-- `link` in header to ensure progressive rendering (some browsers intend to avoid reflow when find link in body, they don't render before loading done)
+  + script at bottom (in case it prevents parallel downloading)
 
-- script at bottom (it prevents parallel downloading)
+  + inline script and css boost responsiveness but lose caching.
 
-- inline script and css boost responsiveness but lose caching.
+  + iPhone only cache files less than 25k
 
-- static gif to palette PNG (PNG8)
+  + preload assets for next page
 
-- optimize images with tool
-
-- no scaling images
-
-- iPhone only cache files less than 25k
-
-- preload assets for next page
-
-- postload assets unrelated for initial rendering.
+  + postload assets unrelated for initial rendering.
+  
+- js
+  + framework
+- css
 
 ## HOL(Head of Line) blocking: in FIFO sequence processing, the first in the task line blocks those after it;
  - input buffered network switches; 
@@ -133,6 +145,8 @@ architecture & design
  	.) root state changes cause child components re-render, unless 'shouldComponentUpdate' is correctly implemented; 
 	.) component scoped style in js or manipluate class name;
 	.) virtual-dom is memory consuming;
+- hooks
+  reusability, readability, and testability
 
 ## react native(react for mobile)
 
@@ -876,7 +890,8 @@ won't be applied to webpage, just cached.
 - header compression
 
 ## http3
-http over QUIC.
+http over QUIC/tcp2 (Quick UDP Internet Connections).
+- tcp suffers from head-of-line-blocking 
 
 ## http/2 dependency tree priority model
  * 
@@ -915,7 +930,7 @@ http over QUIC.
  	.) if 'extends' from an alias
 	.）if has an arrow function method
 
-## prettier-eslint don't work if eslint plugin is not installed globally.
+## prettier-eslint do not work if eslint plugin is not installed globally.
 
 ## js-beautify
  - decode unicode escape sequence: -x
@@ -932,6 +947,7 @@ http over QUIC.
  - Content-Type: application/x-www-form-urlencoded multipart/form-data text/plain
  - No event listeners are registered on any XMLHttpRequestUpload object used in the request.
  - No ReadableStream object is used in the request.
+ - `Access-Control-Allow-Origin` in response to control access
 
 ## third-party cookie: another domain in iframe/ajax
  - a looser extent than origin: only top domain difference (whatever subdomain/port/protocol is);
@@ -1234,7 +1250,7 @@ interface a {
 - configs are placed in `getConfig.js`
 
 ## cache
-- no-store, sensitive data should not be saved in persistent store
+- no-store, no cache at all
 - no-cache, check validation each time.
 
 ## lerna
@@ -1292,6 +1308,8 @@ download in other threads other than main thread
     when each file is downloaded, update CSSOM, then continue DOM parsing and RenderTree constructing and painting.
     - render blocking (Render Tree construction is halted).
     - script blocking (scripts after it will not run until this is loaded).
+- Compositing
+  combine 
 
 - metrics
   + FP
