@@ -881,9 +881,10 @@ this.addEventListener('fetch', function(event) {
 
 ## http2/SPDY
 - multiplex streams: all files in a single connection
- * divided into binary frames sent asyncally.
+ * divided into BINARY frames sent asyncally.
  * prioritizing
- * head-of-line blocking occurs when packets lost
+ * intertwined requests and responses
+   (keepalive suffers with HOL blocking of request/response)
 - server push
 won't be applied to webpage, just cached.
  
@@ -891,7 +892,7 @@ won't be applied to webpage, just cached.
 
 ## http3
 http over QUIC/tcp2 (Quick UDP Internet Connections).
-- tcp suffers from head-of-line-blocking 
+- tcp suffers from head-of-line-blocking when packets lost
 
 ## http/2 dependency tree priority model
  * 

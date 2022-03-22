@@ -156,7 +156,7 @@ numeric(ascending) -> string(appear) -> symbol(appear);
       - `for..of`
       - `str.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_').length`
     * subscript is also based on code unit, for+of fixes this;
-    * `charCodeAt/codePointAt`
+    * `charCodeAt/codePointAt` (utf16)
       - index is code unit
       - `charCodeAt` only returns one code unit
       - `codePointAt(0)` returns the full code point
@@ -756,6 +756,17 @@ can not read even sent.
   - none is called except for `componentWillMount` in server side for SSR
     + data is loaded manually from static methods
     + may check if call again fired in componentWillMount in client
+ * new lifecycles (commit phase)
+  - getSnapshotBeforeUpdate (obsolete componentWillUpdate)
+    called before DOM udpate, its result is passed to componentDidUpdate 
+  - getDerivedStateFromProps (obsolete componentWillMount & componentWillReceiveProps) 
+    called after initialized and before re-rendered.
+  - why obsolete in async mode
+    + only componentWillMount is called in SSR, no pairs
+    + may be called multiple times
+      > interrupted with higher priority task, so mounting restarts and calls componentWillMount again
+      <https://github.com/reactjs/reactjs.org/issues/2566>
+    + delays between render phase (Wills...) and commit phase (Dids...)
  * preventDefault instead of 'return false';
  * prop.children represents passed html;
  * fetch for ajax;
