@@ -642,6 +642,7 @@ run(tasks).then(function(rs){
     * host passed to 'call'/'apply' stay as what it is, instead of being converted(null/undefined -> global; non-object -> object);
     * 'caller'/'callee' is inaccessible;
     * 'arguments' is a copy instead of an alias;
+      change value of one aurgment, the original value in arguments array stay untouched.
     * parameters can't has duplicate names, instead of accessing the first one via 'arguments';
 
     * json can't has duplicate names, instead of overwritten(**removed in ES6**);

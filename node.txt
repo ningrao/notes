@@ -138,6 +138,9 @@ install all four kinds dependencies.
 ## list versions
 `npm version pkg versions`
 
+## install from git
+always call `git ls-remote https://....` (with token removed) even for ssh, then `git credential manager` on windows prompt `Connect to Github` window. yarn instead.
+
 ---------------------------------------
 express
 ---------------------------------------
