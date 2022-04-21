@@ -140,6 +140,7 @@ install all four kinds dependencies.
 
 ## install from git
 always call `git ls-remote https://....` (with token removed) even for ssh, then `git credential manager` on windows prompt `Connect to Github` window. yarn instead.
+- it can not handle multiple accounts either.
 
 ---------------------------------------
 express
