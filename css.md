@@ -315,3 +315,33 @@ background-blend-mode: screen, multiply;
   + transform
   + animation
 
+
+## dir
+- position
+```
+/* Shorthand FTW! */
+.element {
+  position: absolute;
+  inset: logical 10px 20px 30px 40px;
+}
+ 
+/* It evaluates to this */
+.element {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-start: 20px;
+  inset-block-end: 30px;
+  inset-inline-end: 40px;
+}
+top  inset-block-start
+left  inset-inline-start
+right inset-inline-end
+bottom  inset-block-end
+```
+- padding/margin (replace inset)
+
+- pseudo-class
+`p:dir(ltr)`
+
+- attr
+`html[dir="rtl"] .opposite {`

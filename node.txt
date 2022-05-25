@@ -78,6 +78,13 @@ remove package-lock.json
 	cd dir
 	npm version
 
+@) list all versions
+npm view pkg versions
+
+@) peer deps
+npm info pkg peerDependencies
+
+
 @) read/write npm config:
 	npm config set/get opt
 
@@ -372,7 +379,9 @@ I/O	-> setImmediate	-> setTimeout/Interval	-> process.nextTick ->[rewind]
 
  *) file deployed in 'svc' under '--base';
 
-@) child_process: spawn
+@) child_process:
+  *) spawn('command', [args], options)
+    - spawn('command arg1 arg2', [], {shell: true, stdio: 'inherit'})
   *) fork: nodejs process (comand line arguments are inherited - process.execArgv, such as debug)
     - inject debug arg: process.execArgv.unshift('--inspect-brk')
 	*) exec: subshell
@@ -446,3 +455,6 @@ macro task -> micro task -> macro task
 * macrotasks (new event loop): setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering
 * microtasks: process.nextTick, Promises, Object.observe, MutationObserver
   - `process.maxTickDepth` prevent that micro tasks queue another to incur indefinite loop
+
+## node-sass
+`npm rebuild node-sass --force --verbose`

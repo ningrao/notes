@@ -165,6 +165,13 @@ numeric(ascending) -> string(appear) -> symbol(appear);
  	.) no flag: 0
 	.) 'g': lastIndex and forward
 	.) 'y': lastIndex (not to forward)
+  ```
+regex1.test(str1);
+console.log(regex1.lastIndex);
+// expected output: 9
+regex1.test(str1);
+console.log(regex1.lastIndex);
+  ```
  * [tagged] template literal (backquotes):	
 	 function filterFun(parts, ...substitutes){};
 		+ parts always have more than one elements than substitutes;

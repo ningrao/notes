@@ -774,7 +774,13 @@ https://www.w3.org/TR/2010/WD-html5-diff-20101019/#changes-2010-06-24
  	.) an empty object is assigned at parse time; overridden at runtime by assigning to 'module.exports';
   .) for both `import` types work, append `exports.default = module.exports`
     import * as mod from 'mod';  -> mod = require('mod');
+    > babel
+      - primitive type `{default: module.exports}`
+      - others, copy properties to a new object and return
     import mod from 'mod';  -> mod = require('mod').default;
+    > babel
+      `{default: module.exports}`
+    > babel can add default automatically `{default: module.exports}`
 
  - CommonJS (sync): exports is an object predefined (which can not be changed as cjs2), output can only be appended to it;
 ```
