@@ -21,6 +21,9 @@ sudo cp -Rvi node-v6.7.0-linux-x64/{bin,include,lib,share} /usr/local
  *) ~: 1.1.x
  *) ^: 1.x.x
 
+@) resolved registry in installeed node_modules take precedence
+  if that is installed from a specified mirror registry, may get multiple registries which **pollutes** package-lock.json
+
 @) install location:
  *) win: %appdata%\npm\node_modules
  *) linux: /usr/lib/node_modules
