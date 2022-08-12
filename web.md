@@ -496,6 +496,10 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
   * optimization option
     - development, 'namedModules' is turned on by default, then 'moduleIds' is 'named'. module id is set to relative path (related to context);
     - production, 'occurrenceOrder' is turned on by default, then 'moduleIds' is 'size'. module id is set to numeric index of occurence;
+
+- watching
+  + restart watching after each HMR compilation from newly added dependencies (file,folder/context)
+  + any one file changed, all files are processed to compare its timestamp to decide whether to update
  
 ## plugins:
 
@@ -618,6 +622,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
     + map of Dependency constructor to the next two Factory instance.
     + NormalModuleFactory.js
       - resolve module path & map loaders
+        + this.ruleSet: loaders(config.modules) definitions
       - then create new NormalModule object
     + ContextModuleFactory.js
     + the two instances are created for each compilation in newCompilationParams
@@ -984,6 +989,7 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
   * mount().prop() gets props of component, shallow().prop() get from root dom.
 
 ## jest
+  * find the text node then call `text()`
   * it caches outputs files automatically;
 	* `collectCoverageFrom` defaults to what tested;
 	* beforeAll for async;

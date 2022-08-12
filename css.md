@@ -123,6 +123,7 @@ inline > external
 ## 7 layouts: block, inline, table, positioned, column, flex, grid;
 
 ## flex(disply:flex/inline-flex): to make content always fill container by growing/shrinking; items with the same dimension in cross-axis;
+- when the content of a flex item overgrows, the item won't shrink since `min-width/height: auto` (its content) by default, change it to `0`
 - by default, grow is turned off, shrink is on
 - if wrap is enabled, the sizes on cross axis is divided according to their actual size.
 - no effect: column, float/clear, vertical-align, ::first*;
@@ -345,3 +346,11 @@ bottom  inset-block-end
 
 - attr
 `html[dir="rtl"] .opposite {`
+
+## box-shadow
+any number of this value
+`[inset] [color] x y blur spread`
+- inset/color can appear at front or end
+- `x y`
+- `x y blur`
+- `x y blur spread`
