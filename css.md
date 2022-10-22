@@ -123,7 +123,9 @@ inline > external
 ## 7 layouts: block, inline, table, positioned, column, flex, grid;
 
 ## flex(disply:flex/inline-flex): to make content always fill container by growing/shrinking; items with the same dimension in cross-axis;
-- when the content of a flex item overgrows, the item won't shrink since `min-width/height: auto` (its content) by default, change it to `0`
+- when the content of a flex item overgrows, the item won't shrink since `min-width/height: auto` (its content) by default
+  + change it to `0`
+  + overflow: hidden
 - by default, grow is turned off, shrink is on
 - if wrap is enabled, the sizes on cross axis is divided according to their actual size.
 - no effect: column, float/clear, vertical-align, ::first*;
@@ -154,7 +156,7 @@ inline > external
 
     flex-start | flex-end | center | space-between | space-around | stretch 
 
-    - align-content: for multi-line/wrap only
+    - align-content: for multi-line/flex-wrap only
 
   + stretch: expand to the same size
 
@@ -314,6 +316,7 @@ background-blend-mode: screen, multiply;
   + will-change
   + filter
   + transform
+    **as a containing block for fixed position descendants**
   + animation
 
 

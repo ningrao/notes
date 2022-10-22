@@ -1366,3 +1366,9 @@ traditionally, it can only appear in a single statement as
 <https://github.com/tc39/proposal-throw-expressions>
 `() => throw 'abc'`
 `a ? b : throw 'abc'`
+
+## onFocus/onBlur for non-default elements
+  Elements who don't have these events by default can work when
+- have `tabindex`
+  `tabindex=-1` to prevent being really focused by tab key
+- contentEditable 

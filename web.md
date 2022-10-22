@@ -1368,3 +1368,6 @@ download in other threads other than main thread
 - python2
 - [vsbuild2017](https://download.visualstudio.microsoft.com/download/pr/343898a7-7d12-4faa-b5df-958b31e57b3e/1ed6bc00aaf9df4b43c5dad91bf046257376cd13764dbf0d044208684adc4c2a/vs_BuildTools.exe)
 - [vc++](https://download.visualstudio.microsoft.com/download/pr/7239cdc3-bd73-4f27-9943-22de059a6267/003063723B2131DA23F40E2063FB79867BAE275F7B5C099DBD1792E25845872B/VC_redist.x64.exe)
+
+## label
+when it contains input/button, its `for` won't work to target others
