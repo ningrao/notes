@@ -1356,6 +1356,11 @@ xhr.send();
   });
     ```
 
+- ref
+  + won't rerender
+  + call setState when mutated, or error occurs
+    `if (this.state.value !== newValue) this.setState({value: newValue})`
+
 ## new Function
 - scope is global
 

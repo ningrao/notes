@@ -1037,6 +1037,9 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
     + dom selector doesn't work such as '.class_name'
  - `simulate` works on Component
 
+ - coverage
+ `npm test -- --coverage --collectCoverageFrom=src/components/pages/admin_page/* src/components/pages/admin_page/__tests__/* -u --coverageReporters lcov --coverageReporters text-summary`
+
 ## craco debug
 200~@craco/craco/bin/craco.js
 processArgs.unshift('--inspect-brk')
@@ -1347,6 +1350,27 @@ download in other threads other than main thread
 - `.text()` should be invoked in `should(function)` or as `.invoke('text')`
 - it only retries the last one function
 - all functions don't return the value directly, get it in `then`, `should`
+- `window.parent/top === ` is replaced with `self`
+  + `modifyObstructiveCode: false`
+  + store in a variable
+- debug
+  `set DEBUG=cypress:* && npx cypress open`
+- tags should not be quoted if only a single name
+  `--env TAGS=@test`
+- delay response
+```
+  cy.intercept("GET", /groups?(.)*&query=(\S+)/, (req) => {
+    req.on('response', (res) => {
+      // Wait for delay in milliseconds before sending the response to the client.
+      res.setDelay(3000)
+    }
+  )
+})
+```
+
+- out of band commands won't work, such as in `setTimeout` devtools console, instead
+  + `cy.clock()`
+  + `cy.now()`
 
 ## cross-domain communication
 - server proxy
@@ -1371,3 +1395,11 @@ download in other threads other than main thread
 
 ## label
 when it contains input/button, its `for` won't work to target others
+
+## react-devtools
+use standalone version to debug react in iframe
+
+## tailwind
+- NO spaces in arbitrary values
+  `bg-[rgb(0,0,0)]` rather than `bg-[rgb(0, 0, 0)]`
+- `rgba` doesn't work in arbitrary values, instead adopt opacity modifier for color `rgb()/20`

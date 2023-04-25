@@ -273,8 +273,9 @@ inline > external
 ## multiline text ellipsis
 ```
     overflow: hidden;
+    word-break: break-all;
     text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     display: -webkit-box;
 ```
@@ -357,3 +358,6 @@ any number of this value
 - `x y`
 - `x y blur`
 - `x y blur spread`
+
+## transition
+- `transition-duration` implies `transition-property: all` unless explicitly set
