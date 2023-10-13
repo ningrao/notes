@@ -126,18 +126,28 @@ inline > external
 - when the content of a flex item overgrows, the item won't shrink since `min-width/height: auto` (its content) by default
   + change it to `0`
   + overflow: hidden
-- by default, grow is turned off, shrink is on
+- by default
+  + grow on the main axis is off
+    - on the cross axis it's on, if align-items is set, turned off then.
+  + shrink is on
 - if wrap is enabled, the sizes on cross axis is divided according to their actual size.
 - no effect: column, float/clear, vertical-align, ::first*;
 - direct text is wrapped in anonymous item;
 - absolutely positioned child doesn't participate in the flex layout;
 - percentage in padding/margin on item is not consistent across browsers;
-- flex-basis: initial width/height before fill is applied, take precedence over 'width/height';
-  + auto: calc the original size on the fly
-  + 0: won't shrink other siblings 
+- flex-basis: free spaces == total - sum of this
+  + auto: consult with the width/height property
+  + content: calc the its content size on the fly
+  + 0: its space is treated as free
 - flex-grow/shrink: set on items of flex-box, a factor relative to the rest items among items for proporation of leftover space or shrinked space;
 - flex-wrap:wrap; grow/shrink no need to exist;
-- if no flex-grow/shrink is specified, fill based on the propotion of their basis;
+- default value
+  + `flex: initial`: `0 1 auto`
+    default
+  + `flex: auto`: `1 1 auto`
+  + `flex: none`: `0 0 auto`
+  + `flex: int`: `int int 0`
+    - `basis` is 0
 - flex-direction: row/collumn
   children runs in a row/collumn
 
@@ -152,6 +162,7 @@ inline > external
     `[auto |] flex-start | flex-end | center | baseline | stretch`
 
     - align-items: on container, default for all items
+      + stretch: full size in the cross-axis
     - align-self: on item itself
 
     flex-start | flex-end | center | space-between | space-around | stretch 
@@ -173,9 +184,18 @@ inline > external
 - 'auto' is 'max-content' or minimum size(towarding to content size);
 - name in '[]' denotes line;
 - 1fr takes 1/* of all fractions;
-
-
-
+- `grid-row/column-start/end: lineIndex`
+  specify explicitly this cell's four lines position within the grid defined by `grid-template-columns`
+```
+  1     2     3
+1 |-----|-----|
+  | aa  | aaa |
+2 |-----|-----|
+  | ddd | ddd |
+3 |-----|-----|
+```
+  + lineIndex: the lines of the grid
+  + the index starts from 1
 ## 3d:
 - space, e.g. distance from user/camera/container to the z=0 plane (where the scene is exactly contained in camera)
   .) if not set, always 2 dimensions;

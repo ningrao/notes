@@ -391,7 +391,7 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
  - return array of config to output several bundling for once;
  - use 'define' plugin to set global variable from file for conditional build along with uglify;
  	..) value can be a installed module name;
- - css imported is inserted in to html as <style>; or employ 'extract-text-webpack-plugin' to extract them into a css file;
+ - css imported is inserted in to html as `<style>`; or employ 'extract-text-webpack-plugin' to extract them into a css file;
  - './' required in 'entry' if relative
  - '-p' flag only set NODE_ENV for compiled code; set this in command line preceding 'webpack' for tool itself;
  - special chars in file names may cause problems;
@@ -403,8 +403,8 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 	*- publicPath should has trailing '/';
  - webpack-dev-middleware/[webpack-hot-middleware] injects webpack-dev-server into connect-app;
  - loaders dependency (adopt 'enforce' to ensure order);
-	*- 'loader!dependLoader'
-	*- [loader, dependLoader]
+	* 'loader!dependLoader'
+	* [loader, dependLoader]
  - css-loader: css -> js; (has to be used with other plugins: extract(file)/style(tag))
 	 - css-loader/locals: only return module name mapping without file emitting;
    - if 'modules' not turned on, name mapping is not emitted, since needless.
@@ -1403,3 +1403,76 @@ use standalone version to debug react in iframe
 - NO spaces in arbitrary values
   `bg-[rgb(0,0,0)]` rather than `bg-[rgb(0, 0, 0)]`
 - `rgba` doesn't work in arbitrary values, instead adopt opacity modifier for color `rgb()/20`
+
+
+## typescript
+- `(../)*node_modules/@types` are picked up automatically
+  more specified in
+  ```
+  "compilerOptions": {
+    "types": ["node", "jest", "express"]
+  }
+  ```
+- `import type`
+  prepend `typeof` automatically if the target is a value
+
+- `unknown`
+  restricted `any`, requires type checking when use.
+
+- interfaces with the same name are merged
+
+- class is also a type (`typeof` is not required)
+
+- arbitrary fields
+<https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures>
+```
+interface NumberOrStringDictionary {
+  [index: string]: number | string;
+  length: number; // ok, length is a number
+  name: string; // ok, name is a string
+}
+```
+
+- global types without importing to use, extending the `module` scope
+  + `declare`
+  + global
+    ```
+    global {
+      type TName = string
+    }
+    ```
+
+- function
+```
+// argument names are mandatory
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
+
+interface Obj {
+  MethodFunc(source: string, subString: string): boolean;
+}
+
+type SearchFunc = (string, string) => boolean;
+```
+
+- string array to union
+  + const
+  ```
+    const array = ['value1', 'value2', 'value3'] as const;
+    type UnionType = typeof array[number]; // 'value1' | 'value2' | 'value3'
+  ```
+
+- extract generic types
+```
+type ExtractGenericTypes<T> = T extends Api<infer U1, infer U2, infer U3, infer U4, infer U5> ? [U1, U2, U3, U4, U5] : never;
+```
+
+## <script>
+- crossorigin
+  check cors header if present
+  + "" === "anonymouse"
+    without cookies
+  + "use-credential"
+- type='module'
+  implies 'crossorigin'

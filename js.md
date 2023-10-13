@@ -418,7 +418,7 @@ run(tasks).then(function(rs){
 
 ##	ES7
 
-- exponential operator(**);
+- exponential operator(`**`);
 - Array.prototype.includes
  * NaN can be found(indexOf can't, which uses '===');
 
@@ -457,7 +457,8 @@ run(tasks).then(function(rs){
  * default exported value is placed in a field named 'default';
 
  * export what imported:
-    ????default value can not be reexported as default: 
+   * default value
+    `export { default as Name } from file`
 
    * import field, export field;
     export {name1 as Name1, name2} from path
