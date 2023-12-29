@@ -180,12 +180,32 @@ inline > external
 
 
 ## grid
+- define size (and line names)
+  `grid-template-rows/columns: [lineA] 1fr 2fr 1fr;`
+  + minmax(min, max): between
+  + auto
+    - minmax(min-content, max-content)
+    - min-content: minmax(auto, 2fr)
+    - max-content: minmax(1fr, auto)
+  + fit-content(arg)
+    `min(max-content, max(auto, arg)`
+  + repeat(count, unit)
+    `repeat(3, 1fr)` = `1fr 1fr 1fr`
+    - count
+      + auto-fill, get the count be division
+      + auto-fit, in addition collapse empty tracks
+- line name
+  - multiple names for a single line [lineA aliasLineA]
+  - an area name is automatically created if two lines with suffix `-start` and `-end` exist
+    `[content-start] 1fr [content-end]` the `1fr` cell would be named `content` without explicit definition.
+  - vice versa, lines with both suffixes will be created based on `grid-template-areas`
+  - duplicate names are allowed, append the index for to refer to others than the first one `lineName 3` (starts from 1)
 - margins of container/content and item/item don't collapse;
 - 'auto' is 'max-content' or minimum size(towarding to content size);
 - name in '[]' denotes line;
 - 1fr takes 1/* of all fractions;
-- `grid-row/column-start/end: lineIndex`
-  specify explicitly this cell's four lines position within the grid defined by `grid-template-columns`
+- `grid-row/column-start/end: lineIndex/lineName`
+  specify explicitly this cell's four lines position within the grid defined by `grid-template-columns/rows`
 ```
   1     2     3
 1 |-----|-----|
@@ -381,3 +401,19 @@ any number of this value
 
 ## transition
 - `transition-duration` implies `transition-property: all` unless explicitly set
+- auto height (columns not supported widely)
+```
+.wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s ease-out;
+}
+
+.wrapper.is-open {
+  grid-template-rows: 1fr;
+}
+
+.inner {
+  overflow: hidden;
+}
+```

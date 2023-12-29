@@ -916,6 +916,7 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
  - scp: frame-src
 
 ## eslint:
+- `--print-config file` to display the rules as well as other configs
  - dot file is ignored by default;
 	- when linting ignored file error: "eslint file ignored by default use a negative ignore pattern"
  - shared-node-browser: only those common in both; 
@@ -1406,6 +1407,19 @@ use standalone version to debug react in iframe
 
 
 ## typescript
+- access nested types with square, rather than dot which is invalid
+  `IStateFilters['others']['readiness']`
+- local lookup strategy
+  `sameName.d.ts` -> `sameName.ts` -> `sameName.js`
+  + it will infer types from `.js` implementation files if `allowJs`
+  + `declare module` no effect, e.g. it's always augmenting
+- node_modules lookup strategy
+  `sameName.d.ts` -> `types/typings`  -> `declare module`
+  + inference won't happen even `allowJs`
+  + `declare module`
+    - relative path in the lib won't work
+    - if inside a file with `import`, it augments an exsiting one, e.g. it's not a declartion of this module which would still be unfound.
+
 - `(../)*node_modules/@types` are picked up automatically
   more specified in
   ```
@@ -1419,7 +1433,17 @@ use standalone version to debug react in iframe
 - `unknown`
   restricted `any`, requires type checking when use.
 
-- interfaces with the same name are merged
+- interfaces/classes with the same name are merged
+
+  + reopen an interface/class in other modules
+```
+declare module 'pretender' {
+  export interface Server {
+    public handledRequests: Request[]
+  }
+}
+```
+  + `class` should be **replaced** with `interface`
 
 - class is also a type (`typeof` is not required)
 
@@ -1433,14 +1457,15 @@ interface NumberOrStringDictionary {
 }
 ```
 
-- global types without importing to use, extending the `module` scope
-  + `declare`
+- global types without importing when use, extending the `module` scope
+  + no `import` in the type file, or its restricted to this module scope
   + global
     ```
     global {
       type TName = string
     }
     ```
+    - this will fail if no `import` in this file
 
 - function
 ```
@@ -1453,7 +1478,7 @@ interface Obj {
   MethodFunc(source: string, subString: string): boolean;
 }
 
-type SearchFunc = (string, string) => boolean;
+type SearchFunc = <T>(arg1: T, arg2: string) => boolean;
 ```
 
 - string array to union
@@ -1468,6 +1493,8 @@ type SearchFunc = (string, string) => boolean;
 type ExtractGenericTypes<T> = T extends Api<infer U1, infer U2, infer U3, infer U4, infer U5> ? [U1, U2, U3, U4, U5] : never;
 ```
 
+- generic types should be passed all or nothing, fails otherwise
+
 ## <script>
 - crossorigin
   check cors header if present
@@ -1476,3 +1503,13 @@ type ExtractGenericTypes<T> = T extends Api<infer U1, infer U2, infer U3, infer 
   + "use-credential"
 - type='module'
   implies 'crossorigin'
+
+
+## vitest
+- debug `npm test --  DeviceList --inspect-brk --single-thread`
+
+- `mockReturnValue` is singleton
+- `mockReturnValueOnce` takes precedence than `mockReturnValue`
+- `mockReset` sets to an empty function
+  + including `mockReturnValue/...`
+- `mockRestore` sets to whatever passed to `fn()` 

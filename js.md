@@ -260,7 +260,7 @@ let {type, var1='none', loc: {start: startNew}, range: [, secIndex, ...restNums]
  * Object.is() to check duplicate;
  * duplicate value is dropped silently;
 
--WeakSet (used to track references to 'object value')
+- WeakSet (used to track references to 'object value')
  * nonobject(including null) throws error;
  * when no references (**current** reference to the object in this is weakset/map is not taken into a account) to the object, garbage collector will reclaim it when it runs(not necessarily immediately);
  * no iterator;
@@ -688,7 +688,7 @@ trace = function (a, c) {
 
 
 
--event coordinates:
+- event coordinates:
 *) pageX/Y gives the coordinates relative to the <html> element in CSS pixels.
 *) clientX/Y gives the coordinates relative to the viewport in CSS pixels.
 *) screenX/Y gives the coordinates relative to the screen in device pixels.
