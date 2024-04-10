@@ -343,6 +343,7 @@ module.exports = function(moduleFrom) {
 ### child process;
 * pass debug argument to child process
 * if child cannot be paused, combine console and chrome (inspect & debug)
+* environment variables are inheritted unless explicitly passed in the spawn or exec options.
 
 
 @) when run in debug mode, don't redirect output like this:
@@ -471,3 +472,6 @@ macro task -> micro task -> macro task
 ## module type in `.js` is specified by `type: 'module'/'commonjs'` in package.json
 - or explicitly with extensions ".cjs/mjs"
   + they can not be omited
+
+## timezone
+`process.env.TZ` set at runtime doesn't affect Date, instead passed before the process starts.

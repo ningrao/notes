@@ -188,6 +188,9 @@ data tracking
     - `body /deep/ p` any root
   + `::host` control container from inside
   + event target is hoisted to its host
+  + css outside taking effects.
+    - inheritable (color/...)
+    - custom proporty (variable)
   
  - html import
   obsolete, superceded by html module <https://github.com/WICG/webcomponents/blob/gh-pages/proposals/html-modules-proposal.md>
@@ -1001,11 +1004,12 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
   * 'react-flow-props-to-prop-types' is not compatible with 'istanbul' when 'collectCoverage' is set.
 
   - `import * as abc from ...`
-    change `abc.field` affects everywhere
+    change `abc.field` affects everywhere, since modules are cached.
 
   -  debug
-    `node --inspect node_modules/jest/bin/jest --runInBand`
+    `node --inspect/inspect-brk  node_modules/jest/bin/jest --runInBand`
     `debugger`
+    + in CRA, this won't work, add `--inspect` in `react-scripts` or `craco`
 
   - jest.mock will be hoisted to the top (variable reference results error) 
     + jest.requireActual
@@ -1508,8 +1512,29 @@ type ExtractGenericTypes<T> = T extends Api<infer U1, infer U2, infer U3, infer 
 ## vitest
 - debug `npm test --  DeviceList --inspect-brk --single-thread`
 
+- console output truncation prevention
+ env: `DEBUG_PRINT_LIMIT=99999`
+
+- `.only` is allowed only in development env otherwise pass `--allowOnly`
+
+- change timezone in `test-globals.ts`
+```
+export const setup = () => {
+  process.env.TZ = 'UTC'
+}
+
+// vitest.config.ts
+    globalSetup: './src/test-globals.ts',
+
+```
+
 - `mockReturnValue` is singleton
 - `mockReturnValueOnce` takes precedence than `mockReturnValue`
 - `mockReset` sets to an empty function
   + including `mockReturnValue/...`
 - `mockRestore` sets to whatever passed to `fn()` 
+- auto-mock
+  When vi.mock() is called without factory and no `__mock__/fileName` is found
+  + functions are replaced with `() => void 0`
+  + arrays are emptied
+  + primitives/classes/objects keep the same
