@@ -188,6 +188,7 @@ data tracking
     - `body /deep/ p` any root
   + `::host` control container from inside
   + event target is hoisted to its host
+  + `document.body.dir` takes effect
   + css outside taking effects.
     - inheritable (color/...)
     - custom proporty (variable)
@@ -985,7 +986,9 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
 ## source map may cause debugging problem;
 
 ## enzyme
-	* shallow: no instances in desendants;
+	* shallow
+    - no instances in desendants;
+    - simulate('click') won't propagate & bubbleup
 	* equals: full props match
 	* matchesElement: subcollection of props match;
 	* call wrapper.update() when html changed before traversing(find/contains/...);
@@ -993,6 +996,7 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
   * mount().prop() gets props of component, shallow().prop() get from root dom.
 
 ## jest
+  * `--logHeapUsage` detect memory leaks
   * find the text node then call `text()`
   * it caches outputs files automatically;
 	* `collectCoverageFrom` defaults to what tested;
@@ -1199,74 +1203,6 @@ calledWith: deepEqual (sinon.match.same(obj) to apply shallow)
 
 ## prefetch (for next navigation)
 
-## typescript
-
-- suppress error
-  - tslint: `/* tslint:disable-next-line */`
-  - typescript: `// @ts-ignore`
-- when `extends` from an union `a | b`, it's restraned to only `a` or `b`
-- module: commonjs for 'lib', es6 form 'es' and webpack (tree-shaking).
-- only set 'files' to entry point, or unused files are also checked.
-- import-name rule can not handle name with only '../'
-- `... rule requires type information.`, pass `--project` to invoke type checking.
-- `include` should cover the file if type checking is invoked.
-- variable-name doesn't allow PascalCase for stateless component
-- typescript can not check types of other formats than js
-  - adopt require instead of import to bypass typescript
-  - define type definition for the files
-    - define custom types:
-    ```
-      declare module "*.png" {
-        const value: string;
-        export default value;
-      }
-    ```
-    - css: adopt typings-for-css-modules-loader to substitute css-module and turn on 'namedExport: true'
-    - if css is not referenced, will not be extracted.
-    - the first time may not find, for it generates after tsc.
-    - fail to generate when `modules` flag is not set for imported file
-- es6 target compiling adopts 'classic' module resolution, which picks up '.ts' only.
-- to remove a field from extended inteface, set its type to 'never'
-- if two base types has conflict fields, redefine it in derived.
-- treat 'this.constructor' as a pure function, adopt type assertion:
-` (this.constructor as typeof SomeClass).prop;`
-- Exclude works for strings
-`Exclude<"a" | "b" | "c" , "a" | "c">` -> "b"
-- omit fields:
-`Pick<T, Exclude<keyof T, K>>.`
-
-- hybrid types
-
-function or object:
-
-```
-interface SumFunction {
-  // Invoke signature.
-  (param: number): number;
-
-  // Property.
-  empty: () => number;
-}
-```
-- argument name can not be omited
-`fn: (a: number) => void`
-
-- extends multiple types
-  - interface A extends B, C {}
-  - if a type with the same exist on both, define it again.
-
-- allow an interface to add additional properties, add indexer
-```
-interface a {
-  [x: string]: any;
-}
-```
-
-- add custom value to `window`
-`window['name']`
-
-- type alias can appear in type definition of its own, but not of other types.
-
 ## af-webpack
 - configs are placed in `getConfig.js`
 
@@ -1411,6 +1347,74 @@ use standalone version to debug react in iframe
 
 
 ## typescript
+- `--traceResolution`
+- `--diagnostics` verbose
+- suppress error
+  - tslint: `/* tslint:disable-next-line */`
+  - typescript: `// @ts-ignore`
+- when `extends` from an union `a | b`, it's restraned to only `a` or `b`
+- module: commonjs for 'lib', es6 form 'es' and webpack (tree-shaking).
+- only set 'files' to entry point, or unused files are also checked.
+- import-name rule can not handle name with only '../'
+- `... rule requires type information.`, pass `--project` to invoke type checking.
+- `include` should cover the file if type checking is invoked.
+- variable-name doesn't allow PascalCase for stateless component
+- typescript can not check types of other formats than js
+  - adopt require instead of import to bypass typescript
+  - define type definition for the files
+    - define custom types:
+    ```
+      declare module "*.png" {
+        const value: string;
+        export default value;
+      }
+    ```
+    - css: adopt typings-for-css-modules-loader to substitute css-module and turn on 'namedExport: true'
+    - if css is not referenced, will not be extracted.
+    - the first time may not find, for it generates after tsc.
+    - fail to generate when `modules` flag is not set for imported file
+- es6 target compiling adopts 'classic' module resolution, which picks up '.ts' only.
+- to remove a field from extended inteface, set its type to 'never'
+- if two base types has conflict fields, redefine it in derived.
+- treat 'this.constructor' as a pure function, adopt type assertion:
+` (this.constructor as typeof SomeClass).prop;`
+- Exclude works for strings
+`Exclude<"a" | "b" | "c" , "a" | "c">` -> "b"
+- omit fields:
+`Pick<T, Exclude<keyof T, K>>.`
+
+- hybrid types
+
+function or object:
+
+```
+interface SumFunction {
+  // Invoke signature.
+  (param: number): number;
+
+  // Property.
+  empty: () => number;
+}
+```
+- argument name can not be omited
+`fn: (a: number) => void`
+
+- extends multiple types
+  - interface A extends B, C {}
+  - if a type with the same exist on both, define it again.
+
+- allow an interface to add additional properties, add indexer
+```
+interface a {
+  [x: string]: any;
+}
+```
+
+- add custom value to `window`
+`window['name']`
+
+- type alias can appear in type definition of its own, but not of other types.
+
 - access nested types with square, rather than dot which is invalid
   `IStateFilters['others']['readiness']`
 - local lookup strategy
@@ -1463,13 +1467,13 @@ interface NumberOrStringDictionary {
 
 - global types without importing when use, extending the `module` scope
   + no `import` in the type file, or its restricted to this module scope
-  + global
+  + `global` block is ignored in a script (already top scope) 
     ```
     global {
       type TName = string
     }
     ```
-    - this will fail if no `import` in this file
+    - add `export {}` to turn it into a module or remove the `global {}`
 
 - function
 ```

@@ -475,3 +475,11 @@ macro task -> micro task -> macro task
 
 ## timezone
 `process.env.TZ` set at runtime doesn't affect Date, instead passed before the process starts.
+
+## fix an indirect dependency to a specific version
+```
+  "overrides": {
+    "**/indirect-dependency": "2.0.0"
+  }
+```
+- resolutions (in yarn)
