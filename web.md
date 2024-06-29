@@ -946,6 +946,15 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
  - react/require-optimization: mandate shouldComponentUpdate, failed to check when (bugs):
  	.) if 'extends' from an alias
 	.）if has an arrow function method
+ - enable fix react hook deps
+ ```
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        enableDangerousAutofixThisMayCauseInfiniteLoops: true
+      }
+    ],
+ ```
 
 ## prettier-eslint do not work if eslint plugin is not installed globally.
 
@@ -965,6 +974,7 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
  - No event listeners are registered on any XMLHttpRequestUpload object used in the request.
  - No ReadableStream object is used in the request.
  - `Access-Control-Allow-Origin` in response to control access
+  + when `Access-Control-Allow-Credentials: true`, this should not be `*`
 
 ## third-party cookie: another domain in iframe/ajax
  - a looser extent than origin: only top domain difference (whatever subdomain/port/protocol is);
@@ -1502,6 +1512,18 @@ type ExtractGenericTypes<T> = T extends Api<infer U1, infer U2, infer U3, infer 
 ```
 
 - generic types should be passed all or nothing, fails otherwise
+
+- arguments
+  json fields cast automatically unless inline passing
+  ```
+  type Abc = 'abc'
+  type Obj = { a: Abc }
+  function f(a: Abc) {}
+  f({ a: 'abc' }) // works
+  const o = { a: 'abc' }
+  f(o) // error
+  ```
+  `fun({a: 'abc'})`
 
 ## <script>
 - crossorigin
