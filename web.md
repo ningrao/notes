@@ -504,6 +504,11 @@ grunt.registerMultiTask('task1', 'this is task1', function(arg1, arg2){
 - watching
   + restart watching after each HMR compilation from newly added dependencies (file,folder/context)
   + any one file changed, all files are processed to compare its timestamp to decide whether to update
+
+- v5
+  + builtin logger requires
+    ```
+    ```
  
 ## plugins:
 
