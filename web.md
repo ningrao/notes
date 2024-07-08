@@ -1564,3 +1564,4 @@ export const setup = () => {
   + functions are replaced with `() => void 0`
   + arrays are emptied
   + primitives/classes/objects keep the same
+aaaa
