@@ -971,7 +971,7 @@ http over QUIC/tcp2 (Quick UDP Internet Connections).
  - methods: GET, POST, HEAD
  - headers: Accept Accept-Language Content-Language Content-Type (but note the additional requirements below) Last-Event-ID DPR Downlink Save-Data Viewport-Width Width
  - Content-Type: application/x-www-form-urlencoded multipart/form-data text/plain
- - No event listeners are registered on any XMLHttpRequestUpload object used in the request.
+ - No event listeners are allowed to be registered on any XMLHttpRequestUpload object used in the request.
  - No ReadableStream object is used in the request.
  - `Access-Control-Allow-Origin` in response to control access
   + when `Access-Control-Allow-Credentials: true`, this should not be `*`
